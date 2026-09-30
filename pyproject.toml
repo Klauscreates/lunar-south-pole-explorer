@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lunar-south-pole-mission-planner"
+version = "0.2.0"
+description = "Scientifically traceable lunar surface Sun, Earth, terrain-horizon, power, and visibility simulation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.26,<3",
+  "pyproj>=3.6,<4",
+  "rasterio>=1.3,<2",
+  "scipy>=1.11,<2",
+  "spiceypy==8.2.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[tool.setuptools.packages.find]
+include = ["science*"]
+
+[tool.setuptools.package-data]
+"science.ephemeris" = ["kernels.lock.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"

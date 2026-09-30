@@ -1,0 +1,31 @@
+{
+  "name": "lunar-mission-planner-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "node scripts/sync-cesium.mjs",
+    "planner": "node scripts/planner.mjs",
+    "planner:background": "node scripts/planner-service.mjs start",
+    "planner:status": "node scripts/planner-service.mjs status",
+    "planner:stop": "node scripts/planner-service.mjs stop",
+    "terrain:prepare": "../../.venv/bin/python ../../scripts/prepare_web_terrain.py && ../../.venv/bin/python ../../scripts/prepare_local_atlas.py",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "cesium": "^1.145.0",
+    "next": "16.3.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.3.6",
+    "typescript": "^5.9.0"
+  }
+}

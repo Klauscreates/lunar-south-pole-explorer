@@ -1,0 +1,125 @@
+import hashlib
+import json
+import math
+import unittest
+from pathlib import Path
+
+OUTPUT = Path(__file__).resolve().parents[1] / "outputs" / "simulation.json"
+CSV_OUTPUT = OUTPUT.with_suffix(".csv")
+
+# Captured from the last Horizons-only operational export before the SPICE
+# validator was enabled. Validator provenance is intentionally excluded: this
+# regression locks only the displayed samples, derived windows, and flat CSV.
+PRE_SPICE_SAMPLES_SHA256 = (
+    "de363fccd44c5275f87e4402cd1079045337e968dd064a4f5c2cfc4e63737c7b"
+)
+PRE_SPICE_WINDOWS_SHA256 = (
+    "7dd17e1914eb3b183eca94bf6a972644da808c674f3e3e86b7c3186c94de054b"
+)
+PRE_SPICE_CSV_SHA256 = (
+    "a16bed59fafbf305437dd7e14ed9fc70faf68905dbf4294acb7503fb77ee80c0"
+)
+
+
+def _canonical_sha256(value):
+    encoded = json.dumps(
+        value,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+@unittest.skipUnless(
+    OUTPUT.exists(), "Run run_simulation.py to create integration artifact"
+)
+class GeneratedResultTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.result = json.loads(OUTPUT.read_text(encoding="utf-8"))
+
+    def test_expected_full_week_dimensions(self):
+        self.assertEqual(self.result["schema_version"], "1.1.0")
+        self.assertEqual(len(self.result["samples"]), 1009)
+        self.assertEqual(len(self.result["horizon"]["profile"]), 720)
+        self.assertEqual(self.result["validation"]["overall_status"], "PASS")
+
+    def test_required_local_spice_crosscheck_passes_all_epochs(self):
+        validation = self.result["validation"]["independent_spice"]
+        self.assertEqual(validation["status"], "PASS")
+        self.assertTrue(validation["required"])
+        self.assertFalse(validation["used_for_simulation"])
+        self.assertEqual(validation["targets"]["sun"]["sample_count"], 1009)
+        self.assertEqual(validation["targets"]["earth"]["sample_count"], 1009)
+        self.assertLess(
+            validation["targets"]["sun"]["angular_separation_arcsec"]["maximum"],
+            1.0,
+        )
+        self.assertLess(
+            validation["targets"]["earth"]["angular_separation_arcsec"]["maximum"],
+            1.0,
+        )
+
+    def test_validator_does_not_change_operational_series_windows_or_csv(self):
+        self.assertEqual(
+            _canonical_sha256(self.result["samples"]),
+            PRE_SPICE_SAMPLES_SHA256,
+        )
+        self.assertEqual(
+            _canonical_sha256(self.result["windows"]),
+            PRE_SPICE_WINDOWS_SHA256,
+        )
+        self.assertTrue(CSV_OUTPUT.is_file(), "Canonical CSV export is missing")
+        self.assertEqual(
+            hashlib.sha256(CSV_OUTPUT.read_bytes()).hexdigest(),
+            PRE_SPICE_CSV_SHA256,
+        )
+
+    def test_spice_kernel_set_is_pinned_and_covers_interval(self):
+        source = self.result["data_sources"]["spice_validation"]
+        self.assertEqual(source["role"], "independent_validator_only")
+        self.assertFalse(source["used_for_operational_samples"])
+        for target in ("sun", "earth"):
+            metadata = source[target]
+            self.assertEqual(metadata["center_frame"], "MOON_ME_DE440_ME421")
+            self.assertTrue(
+                metadata["kernel_coverage"]["requested_interval_fully_covered"]
+            )
+            kernels = metadata["kernel_manifest"]["kernels"]
+            self.assertEqual(len(kernels), 5)
+            self.assertTrue(all(len(kernel["sha256"]) == 64 for kernel in kernels))
+
+    def test_first_reference_epoch_is_real_horizons_result(self):
+        sample = self.result["samples"][0]
+        self.assertEqual(sample["timestamp"], "2026-10-01T00:00:00Z")
+        self.assertAlmostEqual(sample["sun"]["azimuth_deg"], 302.828959535, places=8)
+        self.assertAlmostEqual(sample["earth"]["azimuth_deg"], 358.807428905, places=8)
+
+    def test_all_exported_numbers_are_finite(self):
+        for sample in self.result["samples"]:
+            for body_name in ("sun", "earth"):
+                body = sample[body_name]
+                for key in (
+                    "azimuth_deg",
+                    "elevation_deg",
+                    "terrain_horizon_deg",
+                    "clearance_deg",
+                    "visibility_fraction",
+                ):
+                    self.assertTrue(math.isfinite(body[key]), f"{body_name}.{key}")
+
+    def test_combined_durations_partition_requested_span(self):
+        combined = self.result["windows"]["combined"]
+        total = sum(value["total_duration_seconds"] for value in combined.values())
+        self.assertEqual(total, 7 * 24 * 3600)
+
+    def test_published_pgda_psr_crosscheck(self):
+        crosscheck = self.result["validation"]["terrain"]["published_psr_crosscheck"]
+        self.assertEqual(crosscheck["status"], "PASS")
+        self.assertEqual(crosscheck["source"]["categorical_value"], 0.0)
+        self.assertEqual(crosscheck["source"]["classification"], "NOT_PSR")
+
+
+if __name__ == "__main__":
+    unittest.main()
