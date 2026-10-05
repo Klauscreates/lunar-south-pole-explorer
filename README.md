@@ -85,7 +85,9 @@ Root `run_*.py` entry points regenerate their respective studies. Read the metho
 
 ## Hosting
 
-Permanent cloud deployment is not yet complete. Both Next.js and the terrain backend must be hosted; a frontend-only upload is insufficient. Server-only `TERRAIN_SERVICE_URL` supports a separate backend. See [deployment requirements](docs/RELEASE_ACCEPTANCE.md). Temporary tunnel links are not permanent hosting.
+**Live app: [Lunar South Pole Explorer](https://lunar-south-pole-explorer.onrender.com)** — hosted on Render's free tier, independently of the development Mac. Free instances sleep when idle; allow about a minute for a cold start. Usage limits apply.
+
+Both Next.js and the terrain backend run in one container. Server-only `TERRAIN_SERVICE_URL` also supports a separate backend. See [deployment requirements](docs/RELEASE_ACCEPTANCE.md). Temporary tunnel links are no longer needed for public access.
 
 A single-service Docker configuration and explicit **Free** Render Blueprint are included. See [free deployment instructions and limits](docs/FREE_HOSTING.md).
 

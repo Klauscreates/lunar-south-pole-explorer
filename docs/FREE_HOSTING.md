@@ -1,6 +1,8 @@
 # Free Render deployment
 
-Deployment configuration is prepared; a successful Render build and live acceptance test are still required.
+Live at **https://lunar-south-pole-explorer.onrender.com**. Render successfully built and started commit `737b93f` on the Free / $0 instance on October 4, 2026 (America/Phoenix). Auto-deploy is Off; later documentation commits do not change the running app.
+
+Cloud smoke checks: health and terrain inspection HTTP 200; all five site exports HTTP 200 and SHA-256 matched the published index; height, hillshade, slope, PSR and height-error tiles HTTP 200. Chrome verified Nobile selection, expanded gauges, timeline endpoints, comparison against Test Site A and Connecting Ridge, and orbital playback advancing and pausing. Production `npm audit --omit=dev` reported zero known vulnerabilities. This is not a complete re-run of the acceptance suite or physical iPhone Safari testing. The automated browser date-entry check was inconclusive and is not counted as a pass. No concurrency/load or cold-start benchmark was performed.
 
 1. Sign in to Render and connect GitHub access to **only** `Klauscreates/lunar-south-pole-explorer`.
 2. Create a Blueprint from this repository's `main` branch and root `render.yaml`.
