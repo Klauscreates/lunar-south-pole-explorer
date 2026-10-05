@@ -49,3 +49,4 @@
 .camera-gesture-control button { min-height:44px; border:0; border-radius:14px; padding:8px 12px; background:transparent; color:#b7bdc4; }
 .camera-gesture-control button[aria-pressed="true"] { background:#ffffff20; color:white; }
 .camera-gesture-control span { width:100%; text-align:center; font-size:10px; color:#bcc3cb; padding:0 4px 4px; }
+@media (max-width:950px) { .camera-gesture-control { top:calc(env(safe-area-inset-top, 0px) + 172px); } }
