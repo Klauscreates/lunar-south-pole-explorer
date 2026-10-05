@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "provider": "Solar System Scope / INOVE",
+  "source_page": "https://www.solarsystemscope.com/textures/",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "limitations": "NASA-derived, artist-adjusted visualization maps; not epoch-specific surface measurements, weather or solar activity. Provider notes enhanced colors and fictional gap filling in its texture collection.",
+  "conversion": "macOS sips, maximum dimension 4096, JPEG quality 90. No upscaling. Sun download is already 4096x2048 despite its 8k filename.",
+  "assets": [
+    {"file":"earth_daymap-4k.jpg","width":4096,"height":2048,"sha256":"79876a1cb1a5fe244ef3419f52fc06418e04257aacb3cdeedbf3008fbe82289f","source_url":"https://www.solarsystemscope.com/textures/download/8k_earth_daymap.jpg","source_width":8192,"source_height":4096,"source_sha256":"88ab060b6e7d241cfc590c69f528fab2b3247b738d40124cb590999a6fe44abc"},
+    {"file":"earth_clouds-4k.jpg","width":4096,"height":2048,"sha256":"313fc33096d3d6e377dfb3c16249d3cbf8a2762ef584b41dbbfdd0d1537117d5","source_url":"https://www.solarsystemscope.com/textures/download/8k_earth_clouds.jpg","source_width":8192,"source_height":4096,"source_sha256":"c792eca228989d36ebb45d3ea6ff1198be5e21a25d70d2fbcb2124ffd14ba7f5"},
+    {"file":"sun-4k.jpg","width":4096,"height":2048,"sha256":"f3bade1d040ec22754be64da06c79b7173537976f4548908180b81a06d2facf2","source_url":"https://www.solarsystemscope.com/textures/download/8k_sun.jpg","source_width":4096,"source_height":2048,"source_sha256":"f22b1cfb306ddce72a7e3b628668a0175b745038ce6268557cb2f7f1bdf98b9d"}
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "effective_resolution",
+  "bounds": [
+    -12000.0,
+    -9000.0,
+    12000.0,
+    15000.0
+  ],
+  "resolution_m": 20.0,
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_20MPP_ADJ_EFFRES.TIF",
+  "sha256": "a04f69b56510b27e8ced1ae681ecd7257e46f591d99d1f35d7f0b32ede5df651",
+  "shape": [
+    1200,
+    1200
+  ],
+  "sampling": "bilinear"
+}

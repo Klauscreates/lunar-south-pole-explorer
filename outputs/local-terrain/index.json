@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "sites": [
+    {
+      "site_id": "test-site-a",
+      "parent_sha256": "66d3fd9e7628da7acaf1ee1f7cd8ba12ee3ffa899bb5255f053a6186ded33404",
+      "url": "/data/local-terrain/test-site-a.json",
+      "sha256": "e65205d21cda5005cb8683d3b0e397f9787bf02bb5741ccdd1ee3dcc8d4d67d7"
+    },
+    {
+      "site_id": "connecting-ridge",
+      "parent_sha256": "5d964f2221005bbeae8050e680e821e9eba7adc625ec4fb67db7a99d02eafccb",
+      "url": "/data/local-terrain/connecting-ridge.json",
+      "sha256": "3ffcf2a5603e85277f4c55001e9beb3a02b3b9c0b3b8c7110f9e8a22f625c981"
+    },
+    {
+      "site_id": "haworth",
+      "parent_sha256": "154e4f08c97cbb05dadefe87e73dddc552c05d032c34745bd036a173eb0f6950",
+      "url": "/data/local-terrain/haworth.json",
+      "sha256": "ae7fc62f8ec2b6845cf7880639a2b6e00a50eca0b4fcd45bd84bd958c081f272"
+    },
+    {
+      "site_id": "malapert-massif",
+      "parent_sha256": "c578b4e938f220391807e2e196c6aa78b568cf27274e3ef0521e558c1f2cfb7b",
+      "url": "/data/local-terrain/malapert-massif.json",
+      "sha256": "3df02caed7a976b6492566d13d4235268cc10f7a1367da9e64c0174bb02b70c5"
+    },
+    {
+      "site_id": "nobile-rim-1",
+      "parent_sha256": "dee8b389140e5aa85291e9377009efff11281b94ed47ae1ed31f472cc3aa7c10",
+      "url": "/data/local-terrain/nobile-rim-1.json",
+      "sha256": "9df1678afa49afba460e6d15aa4465442fe8874329f26ade5cd8affc76f01dbf"
+    }
+  ]
+}

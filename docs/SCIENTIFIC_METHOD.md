@@ -21,6 +21,14 @@ site map-frame convention.
 
 The exact pole is intentionally avoided because azimuth is singular there.
 
+The comparative array uses Test Site A solely as a neutral pipeline-validation
+coordinate. Four additional points come from Table A2.1-1 of NASA's
+[2025 Lunar Surface Data Book](https://ntrs.nasa.gov/api/citations/20250002845/downloads/M2M-30044%20Lunar%20Surface%20Data%20Book%20Baseline_Final.pdf?attachment=true).
+NASA describes these as centers of original PGDA DEM polygons with 5–10 m
+coordinate accuracy. That is *not* landing safety, revised-boundary membership,
+or touchdown certification. Connecting Ridge was a 2022 candidate; Haworth,
+Malapert Massif, and Nobile Rim 1 appear in NASA's later nine-region cohort.
+
 ## 2. Celestial geometry and independent local validation
 
 Operational provider: NASA/JPL Horizons observer tables.
@@ -38,7 +46,8 @@ Horizons apparent azimuth/elevation includes light-time, gravitational
 deflection, stellar aberration, precession, and nutation. The full JSON wrapper,
 text result, request parameters, live API signature, source header, retrieval
 time, and SHA-256 are cached. Requests are sequential, server-side, and retried
-with backoff.
+with backoff. HTTPS verification uses the installed `certifi` CA bundle; a
+failed trust check is fatal, never silently bypassed.
 
 Independent implementation validator: NASA/JPL NAIF SPICE through SpiceyPy.
 
@@ -119,6 +128,13 @@ azimuth, the higher obstruction from the two profiles becomes the final
 skyline. Periodic linear interpolation supplies the skyline at an object's exact
 azimuth.
 
+Each candidate result also exports a 360-bin, 1° `horizon_mask`. These are
+the exact integer-azimuth rays already present in the 0.5° computation—not
+azimuth-interpolated values and not a visual WebGL shadow. The mask records the
+minimum center elevation needed to clear the terrain and the range of the
+dominant obstruction. The 0.5° merged skyline remains authoritative for Sun
+and Earth visibility at their off-grid azimuths.
+
 The 200 km radius is explicit, configurable, and not equivalent to a global
 horizon proof. At 200 km, spherical curvature depresses a same-radius surface by
 approximately 11.5 km, making more distant relief unlikely to dominate at this
@@ -154,9 +170,23 @@ inverse square of the live Horizons Sun range. Estimated electrical output is:
 irradiance × panel area × incidence cosine × visible disk fraction × efficiency
 ```
 
-`sun_tracking` uses cosine 1. `horizontal_fixed` uses `max(0, sin elevation)`.
-`custom_normal` takes an East/North/Up normal and dots it with the local Sun
-unit vector.
+The local Sun unit vector at azimuth `A` (north clockwise) and elevation `e`
+is `(cos e sin A, cos e cos A, sin e)` in East/North/Up. The front-face panel
+normal is derived from its tilt and azimuth or a constrained two-axis gimbal.
+The incident factor is `max(0, sun_vector · panel_normal)`, and the incidence
+angle is `acos(sun_vector · panel_normal)`. `sun_tracking` remains the cosine-1
+upper bound. `horizontal_fixed` faces Up. `custom_normal` accepts a full ENU
+normal. `fixed_tilt` supports a stationary panel plane (0° horizontal, 90°
+vertical) and collecting-face azimuth. `gimbal_limited` finds the best pointing
+within stated tilt/yaw hard stops; it does not model actuator dynamics.
+
+Each of the five sites retains all 1,009 epochs for four illustrative 1 m²,
+30%-efficient scenarios: ideal tracking, fixed vertical north, fixed 80° tilt
+north, and a limited gimbal (0–80° tilt, north ±90° yaw). Their cosine loss,
+incidence angle, chosen ENU normal, and limit-active flag are exported per
+epoch. This is an orientation-sensitive *potential*, not a claim about a named
+lander's actual panels. The old 406 W number remains the unconstrained upper
+bound at Test Site A's first epoch, not realistic fixed-panel output.
 
 This excludes temperature, degradation, dust, wiring/conversion losses,
 batteries, and loads. It is an availability estimate, not certified spacecraft
@@ -173,6 +203,38 @@ requested stop time. Transition precision is therefore bounded by the step,
 Earth availability is labeled **Geometric DTE Visibility**. It does not model
 antenna patterns, pointing, transmitter power, frequency, propagation loss,
 Earth ground stations, schedules, or operational constraints.
+
+The separate per-epoch `comms_potential` gauge is a **user-specified,
+center-based screening heuristic**. It consumes the same Earth sample's exact
+Horizons elevation and terrain-horizon interpolation from the authoritative
+720-ray LOLA skyline; it does not resample the 360-bin display mask. The
+display mapping is:
+
+```text
+Earth center clearance <= 0°                      -> index 0 (center blocked)
+center clearance > 0° and Earth elevation <= 2°   -> index 30 (low elevation)
+center clearance > 0° and Earth elevation > 2°    -> index 100 (clear center)
+```
+
+Exactly 2° is marginal. The threshold is absolute elevation above the local
+tangent plane, as requested, **not** clearance above the terrain rim. The
+0/30/100 values are category markers, not received RF signal strength,
+probability of contact, or a validated link margin. They do not account for
+an Earth ground station's position on the apparent disk. The DTE timeline
+continues to show *any exposed Earth disk*: a center-blocked index 0 can
+coexist with a visible limb. In the Test Site A week, this occurs at 92
+sampled epochs. The UI shows both fields rather than silently equating them.
+Conversely, at Haworth on 2026-10-05 15:40 UTC, Earth elevation is 4.80°
+but terrain skyline is 4.75°: the requested rule gives index 100 even though
+only 53.3% of Earth's disk is exposed. The index therefore must not be read
+as an unobstructed-disk or strong-link verdict.
+
+[NASA's Lunar Surface Propagation project](https://www.nasa.gov/glenn/glenn-expertise-space-exploration/scan/lunar-surface-propagation/)
+confirms low-Earth-angle terrain reflections can impair a lunar south-pole
+radio link, but it does not validate a 2°/30%/100% rule. A blocked direct
+Earth center is not a claim that all communication is impossible: [lunar
+relays](https://www.nasa.gov/communicating-with-missions/lunanet/) may provide
+connectivity without direct Earth visibility.
 
 ## 8. What is scientifically accurate now
 
@@ -201,11 +263,13 @@ Earth ground stations, schedules, or operational constraints.
 - No slope-derived site normal, local surface hazards, thermal model, radio link
   budget, or ground-station schedule.
 
-## 10. Site B path
+## 10. Comparative array and next validation boundary
 
-The science engine is already site-configurable. The correct next step is not a
-second hard-coded page: add a batch orchestrator keyed by site/time/panel config,
-run each site through the same immutable provider and terrain contracts, and
-compare normalized metrics with provenance-equivalent inputs. Before ranking
-sites, add uncertainty bands from the LOLA error/effective-resolution products
-and batch the now-active SPICE/Horizons cross-provider gate across every site.
+`run_candidate_array.py` evaluates the neutral coordinate and four NASA region
+reference points with identical time range, observer height, terrain settings,
+and panel assumptions. The index links complete per-site simulations and
+SHA-256 hashes; missing or stale outputs prevent publication. This supports
+click-through comparison, but does not rank landing-site suitability. Next,
+propagate LOLA error/effective-resolution data into window uncertainty bands,
+run azimuth/radius convergence studies per site, and add hardware-specific
+panels/thermal/electrical subsystems and radio-link constraints.

@@ -1,0 +1,19 @@
+.attitude-control { background:linear-gradient(145deg,#111820ce,#12161ba6); border:1px solid #ffffff16; border-radius:18px; padding:14px; margin:16px 0; }
+.attitude-kicker { font-size:10px; text-transform:uppercase; letter-spacing:1.4px; color:#a7b5c7; line-height:1.5; }
+.attitude-controller-row { display:flex; align-items:center; gap:12px; }
+.picker-content .attitude-control label { flex:1; min-width:0; margin:10px 0; font-size:11px; }
+.picker-content .attitude-control select { font-size:16px; background:#18212a; padding:10px 6px; }
+.attitude-control select:focus-visible { outline:2px solid #8bbfff; outline-offset:2px; }
+.attitude-compass { position:relative; flex:0 0 64px; height:64px; border:1px dashed #687f9970; border-radius:50%; background:linear-gradient(90deg,transparent 49%,#7a94ae20 50%,transparent 51%),linear-gradient(0deg,transparent 49%,#7a94ae20 50%,transparent 51%),#0d131bcc; color:#81b7ff; display:grid; place-items:center; }
+.attitude-compass > span:not(.alignment-dot) { position:absolute; font-size:8px; color:#a2b2c4; }
+.compass-north { top:2px; }.compass-south { bottom:2px; }.compass-east { right:3px; }.compass-west { left:3px; }
+.compass-needle { width:34px; height:34px; transition:transform .4s ease; }
+.alignment-dot { position:absolute; width:5px; height:5px; border-radius:50%; background:#6bddb3; transition:transform .3s ease; }
+.attitude-compass.is-tilted { color:#f1b95d; }.is-tilted .alignment-dot { background:#f1b95d; box-shadow:0 0 8px #f1b95d70; }
+.attitude-badges { display:grid; gap:6px; }
+.attitude-badge { display:flex; align-items:center; gap:7px; font-size:11px; line-height:1.4; color:#d0dbe8; }
+.attitude-badge i { width:6px; height:6px; border-radius:50%; background:#81b7ff; flex-shrink:0; }
+.attitude-badge.is-level i { background:#6bddb3; }.attitude-badge.is-tilted i { background:#f1b95d; }.attitude-badge.is-added i { background:#e79879; }
+.attitude-badges > small { color:#a7b5c7; font-size:10px; padding-left:13px; }
+.picker-content .attitude-note { font-size:10px; color:#9aaabd; line-height:1.5; margin:10px 0 0; }
+@media(prefers-reduced-motion:reduce) { .compass-needle,.alignment-dot { transition:none; } }

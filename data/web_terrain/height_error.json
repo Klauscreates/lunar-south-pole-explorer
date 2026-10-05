@@ -1,0 +1,17 @@
+{
+  "name": "height_error",
+  "bounds": [
+    -12000.0,
+    -9000.0,
+    12000.0,
+    15000.0
+  ],
+  "resolution_m": 20.0,
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_20MPP_ADJ_ERR.TIF",
+  "sha256": "c9c4dc590e06e0d3623e181667a18a332c0d40b5af85a1c603bb9c48e2d6e4b8",
+  "shape": [
+    1200,
+    1200
+  ],
+  "sampling": "bilinear"
+}

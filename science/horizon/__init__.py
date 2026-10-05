@@ -5,9 +5,11 @@ from science.horizon.engine import (
     combine_horizon_profiles,
     compute_horizon_profile,
 )
+from science.horizon.mask import build_one_degree_horizon_mask
 
 __all__ = [
     "HorizonProfile",
     "combine_horizon_profiles",
     "compute_horizon_profile",
+    "build_one_degree_horizon_mask",
 ]

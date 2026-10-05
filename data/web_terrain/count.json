@@ -1,0 +1,17 @@
+{
+  "name": "count",
+  "bounds": [
+    -12000.0,
+    -9000.0,
+    12000.0,
+    15000.0
+  ],
+  "resolution_m": 20.0,
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEC_80S_20MPP_ADJ.TIF",
+  "sha256": "08ccc6db8f65a5d0eedcf8e09dd619a5f5dca8e062303dc10e4556b6d90f818f",
+  "shape": [
+    1200,
+    1200
+  ],
+  "sampling": "nearest"
+}

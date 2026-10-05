@@ -94,9 +94,10 @@ export function Timeline({
 
   return (
     <div className="timeline" onPointerDown={chooseFromPointer} role="group" aria-label="Mission availability timeline">
-      <Track label="SUNLIGHT" accent="#ffb74a" samples={samples} predicate={(sample) => sample.sun.visibility_fraction > 0} />
-      <Track label="EARTH DTE" accent="#6ad4ff" samples={samples} predicate={(sample) => sample.earth.visibility_fraction > 0} />
-      <Track label="BOTH" accent="#b7f071" samples={samples} predicate={(sample) => sample.sun.visibility_fraction > 0 && sample.earth.visibility_fraction > 0} />
+      <Track label="SUN DISK" accent="#ffb74a" samples={samples} predicate={(sample) => sample.sun.visibility_fraction > 0} />
+      <Track label="EARTH DISK" accent="#6ad4ff" samples={samples} predicate={(sample) => sample.earth.visibility_fraction > 0} />
+      <Track label="CENTER LOS" accent="#93d8c7" samples={samples} predicate={(sample) => sample.comms_potential.center_clear} />
+      <Track label="BOTH DISKS" accent="#b7f071" samples={samples} predicate={(sample) => sample.sun.visibility_fraction > 0 && sample.earth.visibility_fraction > 0} />
       <span className="timeline-cursor" style={{ left: `calc(92px + (100% - 92px) * ${progress / 100})` }} aria-hidden="true" />
     </div>
   );

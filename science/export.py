@@ -4,8 +4,12 @@ from __future__ import annotations
 
 import csv
 import json
+import os
+import secrets
+import stat
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Iterator, TextIO
 
 
 CSV_FIELDS = [
@@ -34,27 +38,57 @@ CSV_FIELDS = [
 ]
 
 
-def write_json(result: Dict[str, Any], path: Path) -> None:
+@contextmanager
+def _atomic_text_output(
+    path: Path, *, newline: str | None = None, overwrite: bool = True
+) -> Iterator[TextIO]:
+    """Write beside the destination, then atomically replace it on success.
+
+    A random, exclusively created temporary name cannot reuse a caller's
+    ``output.json.tmp`` input. New files obey the process umask; replacement
+    files retain the destination's mode. Without overwrite, a same-directory
+    hard link publishes the completed file only if no destination exists.
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(
-        json.dumps(result, indent=2, sort_keys=False, allow_nan=False),
-        encoding="utf-8",
-    )
-    temporary.replace(path)
+    temporary: Path | None = None
+    try:
+        for _ in range(10):
+            candidate = path.parent / f".{path.name[:32]}.{secrets.token_hex(16)}.tmp"
+            try:
+                fd = os.open(candidate, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+            except FileExistsError:
+                continue
+            temporary = candidate
+            break
+        else:
+            raise OSError("Cannot allocate a unique export temporary file")
+        with os.fdopen(fd, "w", encoding="utf-8", newline=newline) as handle:
+            if overwrite and path.exists():
+                os.fchmod(handle.fileno(), stat.S_IMODE(path.stat().st_mode))
+            yield handle
+        if overwrite:
+            temporary.replace(path)
+        else:
+            os.link(temporary, path)
+            temporary.unlink()
+        temporary = None
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
-def write_csv(result: Dict[str, Any], path: Path) -> None:
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    with temporary.open("w", encoding="utf-8", newline="") as handle:
+def write_json(result: Dict[str, Any], path: Path, *, overwrite: bool = True) -> None:
+    with _atomic_text_output(path, overwrite=overwrite) as handle:
+        json.dump(result, handle, indent=2, sort_keys=False, allow_nan=False)
+
+
+def write_csv(result: Dict[str, Any], path: Path, *, overwrite: bool = True) -> None:
+    with _atomic_text_output(path, newline="", overwrite=overwrite) as handle:
         writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
         writer.writeheader()
         for sample in result["samples"]:
             writer.writerow(_flatten_sample(sample))
-    temporary.replace(path)
 
 
 def _flatten_sample(sample: Dict[str, Any]) -> Dict[str, Any]:
@@ -87,4 +121,3 @@ def _flatten_sample(sample: Dict[str, Any]) -> Dict[str, Any]:
             "estimated_electrical_output_w"
         ],
     }
-

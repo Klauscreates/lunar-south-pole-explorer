@@ -1,0 +1,17 @@
+{
+  "name": "slope_error",
+  "bounds": [
+    -12000.0,
+    -9000.0,
+    12000.0,
+    15000.0
+  ],
+  "resolution_m": 20.0,
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDSM_80S_20MPP_ADJ_ERR.TIF",
+  "sha256": "a503ebe25d6edd23a4b5ce85839dc8f9dc1d8ba59be6ad97a14588cee7dc1d5a",
+  "shape": [
+    1200,
+    1200
+  ],
+  "sampling": "bilinear"
+}

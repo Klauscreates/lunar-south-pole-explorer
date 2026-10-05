@@ -218,8 +218,21 @@ class SpiceEphemerisProvider(EphemerisProvider):
         target_info = _TARGETS[target]
         samples: list[EphemerisSample] = []
         light_times_seconds: list[float] = []
+        time_audit: list[dict[str, Any]] = []
         for timestamp in timestamps:
             et = float(spice.str2et(_spice_utc_string(timestamp)))
+            # Use CSPICE's LSK-driven time subsystem, not a fixed UTC offset.
+            # This is its TT/TDB approximation, not a lunar proper-time model.
+            tt = float(spice.unitim(et, "TDB", "TDT"))
+            recovered_et = float(spice.unitim(tt, "TDT", "TDB"))
+            roundtrip_error = abs(recovered_et - et)
+            if not all(math.isfinite(v) for v in (et, tt, recovered_et)) or roundtrip_error > 1e-6:
+                raise EphemerisError("CSPICE TT/TDB time conversion failed the 1 microsecond round-trip check")
+            time_audit.append({
+                "utc": utc_iso(timestamp), "tdb_seconds_past_j2000": et,
+                "tt_seconds_past_j2000": tt, "tdb_minus_tt_seconds": et - tt,
+                "roundtrip_error_seconds": roundtrip_error,
+            })
             az_state, light_time = spice.azlcpo(
                 "ELLIPSOID",
                 target,
@@ -310,6 +323,22 @@ class SpiceEphemerisProvider(EphemerisProvider):
                     "not modeled by CSPICE azlcpo; retained as a stated "
                     "difference from Horizons apparent observer tables"
                 ),
+            },
+            "time_conversion_audit": {
+                "method": "CSPICE str2et UTC to TDB; unitim TDB to TDT (TT)",
+                "model": "LSK DELTET periodic TT/TDB approximation; not exact lunar proper time",
+                "roundtrip_tolerance_seconds": 1e-6,
+                "samples": time_audit,
+            },
+            "qualification": {
+                "flight_ready": False,
+                "kernel_integrity": "size and SHA-256 pinned; interval coverage checked",
+                "lunar_orientation": "DE440 binary PCK plus explicit Mean-Earth frame; not error-free truth",
+                "antenna_phase_center": "UNKNOWN: generic site observer, no calibrated hardware offset applied",
+                "relativistic_light_propagation": "NOT_IMPLEMENTED: no Shapiro delay or relativistic light deflection",
+                "relativistic_stellar_aberration": "NOT_IMPLEMENTED: CN+S uses Newtonian stellar aberration",
+                "lunar_proper_time": "NOT_IMPLEMENTED",
+                "binding_authority": "SpiceyPy is third-party; CSPICE and locked kernels are NASA/JPL NAIF products",
             },
             "angular_diameter": {
                 "definition": (

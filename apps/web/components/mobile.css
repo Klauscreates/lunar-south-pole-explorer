@@ -1,0 +1,46 @@
+/* Phone/tablet sheets remain non-modal: Globe and navigation always dismiss them.
+   dvh follows Safari toolbars; safe-area insets protect the island/home indicator. */
+@media (max-width: 950px) {
+  .mission-planner { height: 100dvh; font-size: 14px; --mobile-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .mission-planner .lunar-canvas { inset: 0; touch-action: none; }
+  .mission-planner .planner-header { height: calc(64px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); background: #080e16e8; }
+  .mission-planner .planner-brand h1 { font-size: 17px; }
+  .mission-planner .planner-brand .mission-kicker { font-size: 10px; }
+  .mission-planner .header-center { display: none; }
+  .mission-planner .mobile-navigation { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; position: fixed; z-index: 50; bottom: 0; left: 0; right: 0; padding: 8px max(8px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); background: #0b131cf5; border-top: 1px solid #ffffff25; }
+  .mobile-navigation button { min-height: 48px; padding: 8px 4px; font-size: 13px; }
+  .mobile-navigation button[aria-pressed="true"] { background: #294652; border-color: #96c5d6; }
+  .mission-planner .map-sidebar, .mission-planner .site-card, .mission-planner .mission-time, .mission-planner .header-actions { display: none; position: fixed; z-index: 20; top: auto; bottom: var(--mobile-bottom); left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); width: auto; height: auto; max-height: calc(100dvh - 160px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); padding: 20px 16px; overflow: auto; overscroll-behavior: contain; border: 1px solid #ffffff25; border-radius: 18px 18px 10px 10px; background: #101922fa; box-shadow: 0 -12px 45px #0005; }
+  .mission-planner[data-mobile-sheet="sites"] .map-sidebar,
+  .mission-planner[data-mobile-sheet="gauges"] .site-card,
+  .mission-planner[data-mobile-sheet="time"] .mission-time { display: block; }
+  .mission-planner[data-mobile-sheet="tools"] .header-actions { display: grid; gap: 12px; }
+  .mission-planner button, .mission-planner select { min-height: 44px; min-width: 44px; }
+  .mission-planner select, .mission-planner input { font-size: 16px; max-width: 100%; }
+  .mission-planner button:focus-visible, .mission-planner select:focus-visible { outline: 2px solid #a6d6e6; outline-offset: 2px; }
+  .mission-planner .header-actions button { font-size: 16px; padding: 12px; }
+  .mission-planner .site-option { padding: 14px 10px; }
+  .mission-planner .site-option strong { font-size: 16px; }
+  .mission-planner .site-option small, .mission-planner .site-kind, .mission-planner .coordinates { font-size: 12px; line-height: 1.5; }
+  .mission-planner .site-card h2 { font-size: 24px; }
+  .mission-planner .body-summary strong { font-size: 16px; }
+  .mission-planner .body-summary dl, .mission-planner .comms-geometry { font-size: 13px; }
+  .mission-planner .site-card small { font-size: 12px; line-height: 1.5; }
+  .mission-planner .site-card .next-event, .mission-planner .site-card .dte-detail, .mission-planner .site-metrics > div:last-child { display: block; }
+  .mission-planner .site-metrics strong { font-size: 17px; }
+  .mission-planner .layer-control { font-size: 14px; min-height: 44px; }
+  .mission-planner .map-title, .mission-planner .render-caption, .mission-planner .map-reference, .mission-planner .stream-status { display: none; }
+  .mission-planner .map-controls { right: max(12px, env(safe-area-inset-right)); bottom: calc(var(--mobile-bottom) + 12px); }
+  .mission-planner:not([data-mobile-sheet="map"]) .map-controls { display: none; }
+  .mission-planner .time-header { flex-wrap: wrap; gap: 12px; }
+  .mission-planner .time-header strong { font-size: 18px; }
+  .mission-planner .time-header em { font-size: 13px; }
+  .mission-planner .time-actions { flex-wrap: wrap; }
+  .mission-planner .time-slider { height: 44px; touch-action: pan-y; }
+  .mission-planner .time-dates { font-size: 10px; }
+  .mission-planner .spacecraft-study, .mission-planner .analysis-drawer { z-index: 30; left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); top: calc(76px + env(safe-area-inset-top)); bottom: var(--mobile-bottom); max-height: none; padding: 18px; overflow: auto; overscroll-behavior: contain; }
+  .mission-planner .study-layout, .mission-planner .provenance-grid { grid-template-columns: 1fr; }
+  .mission-planner .inspection-card { left: 12px; right: 12px; top: calc(76px + env(safe-area-inset-top)); width: auto; max-height: 50dvh; overflow: auto; }
+  .mission-planner .help-popover { right: 12px; left: 12px; width: auto; top: calc(76px + env(safe-area-inset-top)); max-height: 60dvh; overflow: auto; }
+  .mission-planner .cesium-viewer-bottom { bottom: calc(var(--mobile-bottom) + 3px) !important; }
+}

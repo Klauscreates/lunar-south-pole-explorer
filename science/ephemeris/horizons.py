@@ -7,6 +7,7 @@ import hashlib
 import io
 import json
 import re
+import ssl
 import time
 import urllib.error
 import urllib.parse
@@ -14,6 +15,8 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+import certifi
 
 from science.config import SiteConfig, TimeRangeConfig, utc_iso
 from science.ephemeris.base import EphemerisProvider, EphemerisSample
@@ -198,7 +201,9 @@ class HorizonsEphemerisProvider(EphemerisProvider):
         for attempt in range(3):
             try:
                 with urllib.request.urlopen(
-                    request, timeout=self.timeout_seconds
+                    request,
+                    timeout=self.timeout_seconds,
+                    context=ssl.create_default_context(cafile=certifi.where()),
                 ) as response:
                     payload = json.loads(response.read().decode("utf-8"))
                 return {"response": payload}

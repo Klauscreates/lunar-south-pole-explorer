@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+import math
 from typing import Any, Dict, Sequence, Tuple
 
 from science.errors import ConfigurationError
@@ -127,29 +128,79 @@ class TerrainConfig:
 
 @dataclass(frozen=True)
 class PanelConfig:
+    """First-order panel pointing geometry in the local east/north/up frame.
+
+    ``tilt_deg_from_horizontal`` is the angle between the panel *plane* and
+    the local horizontal plane: 0 degrees faces Up and 90 degrees is vertical.
+    Azimuths describe the outward panel normal, clockwise from local north.
+    The tracking limits are an idealized two-axis pointing envelope, not a
+    model of actuator dynamics, self-shadowing, or spacecraft obstructions.
+    """
+
     panel_area_m2: float = 1.0
     efficiency: float = 0.30
     orientation_mode: str = "sun_tracking"
     custom_normal_enu: Tuple[float, float, float] = (0.0, 0.0, 1.0)
+    tilt_deg_from_horizontal: float = 0.0
+    azimuth_deg: float = 0.0
+    tracking_tilt_min_deg: float = 0.0
+    tracking_tilt_max_deg: float = 90.0
+    tracking_azimuth_center_deg: float = 0.0
+    tracking_azimuth_half_range_deg: float = 180.0
 
     def validate(self) -> None:
-        if self.panel_area_m2 <= 0.0:
+        if not math.isfinite(self.panel_area_m2) or self.panel_area_m2 <= 0.0:
             raise ConfigurationError("Panel area must be positive")
-        if not 0.0 < self.efficiency <= 1.0:
+        if not math.isfinite(self.efficiency) or not 0.0 < self.efficiency <= 1.0:
             raise ConfigurationError("Panel efficiency must be within (0, 1]")
         if self.orientation_mode not in {
             "sun_tracking",
             "horizontal_fixed",
             "custom_normal",
+            "fixed_tilt",
+            "gimbal_limited",
         }:
             raise ConfigurationError(
-                "Panel orientation must be sun_tracking, horizontal_fixed, or "
-                "custom_normal"
+                "Panel orientation must be sun_tracking, horizontal_fixed, "
+                "custom_normal, fixed_tilt, or gimbal_limited"
             )
         if len(self.custom_normal_enu) != 3:
             raise ConfigurationError("Custom panel normal must contain E, N, U")
-        if sum(component * component for component in self.custom_normal_enu) <= 0:
-            raise ConfigurationError("Custom panel normal cannot be the zero vector")
+        if not all(math.isfinite(component) for component in self.custom_normal_enu):
+            raise ConfigurationError("Custom panel normal must be finite")
+        normal_length = math.hypot(*self.custom_normal_enu)
+        if not math.isfinite(normal_length) or normal_length <= 0:
+            raise ConfigurationError(
+                "Custom panel normal must have finite positive length"
+            )
+        if not math.isfinite(self.tilt_deg_from_horizontal) or not (
+            0.0 <= self.tilt_deg_from_horizontal <= 180.0
+        ):
+            raise ConfigurationError("Panel tilt must be within [0, 180] degrees")
+        if not math.isfinite(self.azimuth_deg):
+            raise ConfigurationError("Panel azimuth must be finite")
+        if not all(
+            math.isfinite(value)
+            for value in (
+                self.tracking_tilt_min_deg,
+                self.tracking_tilt_max_deg,
+                self.tracking_azimuth_center_deg,
+                self.tracking_azimuth_half_range_deg,
+            )
+        ):
+            raise ConfigurationError("Tracking pointing limits must be finite")
+        if not (
+            0.0 <= self.tracking_tilt_min_deg
+            <= self.tracking_tilt_max_deg
+            <= 180.0
+        ):
+            raise ConfigurationError(
+                "Tracking tilt limits must satisfy 0 <= min <= max <= 180"
+            )
+        if not 0.0 <= self.tracking_azimuth_half_range_deg <= 180.0:
+            raise ConfigurationError(
+                "Tracking azimuth half-range must be within [0, 180] degrees"
+            )
 
 
 @dataclass(frozen=True)
@@ -193,6 +244,12 @@ class SimulationConfig:
                 "efficiency": self.panel.efficiency,
                 "orientation_mode": self.panel.orientation_mode,
                 "custom_normal_enu": list(self.panel.custom_normal_enu),
+                "tilt_deg_from_horizontal": self.panel.tilt_deg_from_horizontal,
+                "azimuth_deg": self.panel.azimuth_deg,
+                "tracking_tilt_min_deg": self.panel.tracking_tilt_min_deg,
+                "tracking_tilt_max_deg": self.panel.tracking_tilt_max_deg,
+                "tracking_azimuth_center_deg": self.panel.tracking_azimuth_center_deg,
+                "tracking_azimuth_half_range_deg": self.panel.tracking_azimuth_half_range_deg,
             },
         }
 

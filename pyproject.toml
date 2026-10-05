@@ -9,6 +9,7 @@ description = "Scientifically traceable lunar surface Sun, Earth, terrain-horizo
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+  "certifi>=2024.2.2",
   "numpy>=1.26,<3",
   "pyproj>=3.6,<4",
   "rasterio>=1.3,<2",

@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0",
+  "products": [
+    {
+      "site_id": "connecting-ridge",
+      "product_id": "NAC_DTM_ESALL_CR1",
+      "method": "DLR NAC stereo; producer tied to corrected LOLA tracks",
+      "pixel_size_m": 2,
+      "reference_radius_m": 1737400,
+      "product_page": "https://data.lroc.im-ldi.com/lroc/view_rdr/NAC_DTM_ESALL_CR1",
+      "dem": {"file": "connecting-ridge.tif", "sha256": "fc57e2d4452bf2522ae7ed3a091e4f6dfc4eea6a989324edb06344689712a453", "url": "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/ESALL_CR1/NAC_DTM_ESALL_CR1.TIF"},
+      "confidence": {"file": "connecting-ridge-confidence.img", "sha256": "c1847418d7756b47d0abaeaea95e6f8c8af233924494c12f6b9fc33528b25410", "url": "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/ESALL_CR1/NAC_DTM_ESALL_CR1_CONF.IMG"},
+      "readme": {"file": "connecting-ridge-readme.txt", "sha256": "ea72797409a54d0bafb7056c450b8b928a2a5c5e6a5fc0cb712b8198306294e2", "url": "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/ESALL_CR1/NAC_DTM_ESALL_CR1_README.TXT"},
+      "accepted_confidence_values": [14],
+      "limitations": ["2 m post spacing is not 2 m accuracy or sub-meter hazard detection.", "Producer reports 0.5 m RMS against its corrected LOLA controls; not independent absolute accuracy.", "Confidence 0, 1 and 4 excluded (outside, shadow, interpolated).", "Orthophotos may be offset from DEM by 15 m or more; no boulder positions inferred from them."]
+    },
+    {
+      "site_id": "haworth",
+      "product_id": "Lunar_LROnac_Haworth_sfs-dem_1m_v3",
+      "method": "NASA Ames shape-from-shading, controlled to 5 m LOLA; includes LOLA-filled areas",
+      "pixel_size_m": 1,
+      "reference_radius_m": 1737400,
+      "product_page": "https://astrogeology.usgs.gov/search/map/lunar_lro_nac_haworth_photoclinometry_dem_1m",
+      "dem": {"file": "haworth-sfs-1m.tif", "sha256": "023372083f1675ec12bc206e14b2c3af3bf636bdcd33120d592fe00ede23cc56", "url": "https://planetarymaps.usgs.gov/mosaic/Lunar_Photoclinometry/Haworth-SfS/Lunar_LROnac_Haworth_sfs-dem_1m_v3.tif"},
+      "limitations": ["1 m post spacing does not imply 1 m accuracy.", "Publisher reports artifacts and LOLA-filled patches, without a per-pixel origin or height-error map for this early product.", "All Haworth fine-scale coverage is unqualified until pixel provenance is resolved; sampled profiles are diagnostic only."]
+    }
+  ],
+  "other_sites": {
+    "test-site-a": "No covering high-resolution DEM verified in this ingestion; retain LOLA.",
+    "malapert-massif": "NAC_DTM_MALAPERT03 is a 4 m candidate; not ingested or qualified in this run.",
+    "nobile-rim-1": "NAC_DTM_NOBILE01 bounding longitude ends at 36.17 E, short of the 37.36667 E test point; no covering product verified."
+  }
+}

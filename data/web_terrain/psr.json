@@ -1,0 +1,17 @@
+{
+  "name": "psr",
+  "bounds": [
+    -12000.0,
+    -9000.0,
+    12000.0,
+    15000.0
+  ],
+  "resolution_m": 20.0,
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LPSR_80S_20MPP_ADJ.TIF",
+  "sha256": "a155c6b0cf1bbcbd30080f0f027ed5d4c6960c8af242a94be25a6db41532bdc9",
+  "shape": [
+    1200,
+    1200
+  ],
+  "sampling": "nearest"
+}

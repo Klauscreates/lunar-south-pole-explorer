@@ -15,11 +15,16 @@ import rasterio
 import scipy
 
 from science import __version__
-from science.config import SimulationConfig, utc_iso
+from science.comms import classify_comms_potential
+from science.config import PanelConfig, SimulationConfig, utc_iso
 from science.ephemeris import HorizonsEphemerisProvider
 from science.ephemeris.spice import SpiceEphemerisProvider
 from science.errors import SciencePipelineError
-from science.horizon import combine_horizon_profiles, compute_horizon_profile
+from science.horizon import (
+    build_one_degree_horizon_mask,
+    combine_horizon_profiles,
+    compute_horizon_profile,
+)
 from science.power import (
     ASTRONOMICAL_UNIT_KM,
     NOMINAL_SOLAR_IRRADIANCE_W_M2_AT_1_AU,
@@ -87,6 +92,7 @@ def run_simulation(
     horizon = combine_horizon_profiles(
         local_horizon, outer_horizon, workspace / "data" / "cache"
     )
+    horizon_mask = build_one_degree_horizon_mask(horizon)
     emit("Sampling NASA PGDA's published 20 m permanent-shadow map")
     psr_reference = sample_pgda_psr_classification(
         config.site,
@@ -149,20 +155,28 @@ def run_simulation(
     earth_metadata["role"] = "operational_source"
 
     emit("Combining apparent celestial disks with the terrain skyline")
+    panel_scenarios = _panel_scenarios(config.panel)
     output_samples: List[Dict[str, Any]] = []
     for sun_sample, earth_sample in zip(sun_samples, earth_samples):
         sun = classify_visibility(sun_sample, horizon)
         earth = classify_visibility(earth_sample, horizon)
+        comms_potential = classify_comms_potential(earth)
         sun_available = sun["visibility_fraction"] > 0.0
         earth_available = earth["visibility_fraction"] > 0.0
         combined_state = _combined_state(sun_available, earth_available)
         power = estimate_solar_input(sun, config.panel)
+        power_scenarios = {
+            key: estimate_solar_input(sun, scenario)
+            for key, scenario in panel_scenarios.items()
+        }
         output_samples.append(
             {
                 "timestamp": utc_iso(sun_sample.timestamp),
                 "sun": sun,
                 "earth": earth,
+                "comms_potential": comms_potential,
                 "power": power,
+                "power_scenarios": power_scenarios,
                 "geometric_dte_available": earth_available,
                 "combined_state": combined_state,
             }
@@ -206,6 +220,10 @@ def run_simulation(
             "expected_horizon_samples": int(
                 round(360.0 / config.terrain.azimuth_step_deg)
             ),
+            "one_degree_mask_samples": len(horizon_mask["profile"]),
+            "one_degree_mask_source_key_sha256": horizon_mask["metadata"][
+                "source_raycast_cache_key_sha256"
+            ],
             "local_crop_sha256": terrain.metadata["crop_sha256"],
             "outer_crop_sha256": outer_terrain.metadata["crop_sha256"],
             "horizon_cache_key_sha256": horizon.metadata[
@@ -261,7 +279,7 @@ def run_simulation(
     }
 
     result: Dict[str, Any] = {
-        "schema_version": "1.1.0",
+        "schema_version": "1.3.0",
         "software": {
             "name": "Lunar South Pole Mission Planner",
             "version": __version__,
@@ -357,6 +375,22 @@ def run_simulation(
                 "Geometric line of sight only; no antenna, link budget, Earth "
                 "ground-station, or operational constraints."
             ),
+            "comms_potential": {
+                "model": "earth_center_terrain_clearance_v1",
+                "status": "illustrative_geometric_screening_not_measured_signal",
+                "rule": (
+                    "Earth center clearance <= 0 degrees: index 0; otherwise "
+                    "Earth absolute elevation <= 2 degrees: index 30; "
+                    "otherwise index 100. The percentages are display "
+                    "categories, not RF signal strength or link reliability."
+                ),
+                "disk_visibility_distinction": (
+                    "Existing geometric DTE windows count any exposed Earth "
+                    "disk. The center-based index can be zero while an Earth "
+                    "limb remains visible."
+                ),
+                "low_elevation_threshold_deg": 2.0,
+            },
             "window_detection": windows["method"],
             "power_model": {
                 "solar_irradiance_at_1au_w_m2": NOMINAL_SOLAR_IRRADIANCE_W_M2_AT_1_AU,
@@ -371,19 +405,81 @@ def run_simulation(
                     "dust",
                     "wiring and conversion losses",
                     "battery and load behavior",
+                    "lander self-shadowing and panel thermal behavior",
                 ],
+                "scenario_status": (
+                    "illustrative panel pointing geometry; not a measured "
+                    "or flight-qualified lander electrical subsystem"
+                ),
             },
         },
         "panel": config.as_dict()["panel"],
+        "panel_scenarios": {
+            key: {
+                "configuration": replace(config, panel=scenario).as_dict()["panel"],
+                "status": "illustrative_geometry_not_flight_hardware",
+                "description": _PANEL_SCENARIO_DESCRIPTIONS[key],
+            }
+            for key, scenario in panel_scenarios.items()
+        },
         "horizon": {
             "metadata": horizon.metadata,
             "profile": horizon.as_records(),
         },
+        "horizon_mask": horizon_mask,
         "samples": output_samples,
         "windows": windows,
         "validation": validation,
     }
     return result
+
+
+_PANEL_SCENARIO_DESCRIPTIONS = {
+    "ideal_tracking": "Unconstrained normal-to-Sun reference upper bound.",
+    "fixed_vertical_north": (
+        "Fixed vertical collecting face; outward normal points north."
+    ),
+    "fixed_tilt_80_north": (
+        "Fixed face tilted 80 degrees from horizontal toward north."
+    ),
+    "limited_gimbal": (
+        "Ideal two-axis mount limited to 0-80 degree tilt and north +/-90 degree yaw."
+    ),
+}
+
+
+def _panel_scenarios(base: PanelConfig) -> Dict[str, PanelConfig]:
+    """Compare explicit geometry envelopes at the same area and efficiency."""
+    common = {
+        "panel_area_m2": base.panel_area_m2,
+        "efficiency": base.efficiency,
+    }
+    scenarios = {
+        "ideal_tracking": PanelConfig(**common, orientation_mode="sun_tracking"),
+        "fixed_vertical_north": PanelConfig(
+            **common,
+            orientation_mode="fixed_tilt",
+            tilt_deg_from_horizontal=90.0,
+            azimuth_deg=0.0,
+        ),
+        "fixed_tilt_80_north": PanelConfig(
+            **common,
+            orientation_mode="fixed_tilt",
+            tilt_deg_from_horizontal=80.0,
+            azimuth_deg=0.0,
+        ),
+        "limited_gimbal": PanelConfig(
+            **common,
+            orientation_mode="gimbal_limited",
+            tracking_tilt_min_deg=0.0,
+            tracking_tilt_max_deg=80.0,
+            tracking_azimuth_center_deg=0.0,
+            tracking_azimuth_half_range_deg=90.0,
+        ),
+    }
+    for scenario in scenarios.values():
+        scenario.validate()
+    return scenarios
 
 
 def _combined_state(sun_visible: bool, earth_visible: bool) -> str:

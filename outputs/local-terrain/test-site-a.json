@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.1.0",
+  "site_id": "test-site-a",
+  "parent_sha256": "66d3fd9e7628da7acaf1ee1f7cd8ba12ee3ffa899bb5255f053a6186ded33404",
+  "manifest_sha256": "235eceec400c85d075fb010b9749500a41a10fb1aa3f396b4eefeba383606922",
+  "landing_safety_certified": false,
+  "operational_visibility_changed": false,
+  "implementation_sha256": {
+    "run_local_terrain.py": "2f1f14e86e22f0750c751773166168f667b5fd4261cb62c88d473f0bb48b5161",
+    "science/terrain/nearfield.py": "0ef35f7ed85d0c3021faadafe792cf8b914fa052ea0ecb785642040a109d39d2"
+  },
+  "limitations": [
+    "No verified boulder inventory or sub-meter hazard completeness.",
+    "The first native pixel around the observer is unresolved.",
+    "Near-field center rays only; no RF, finite disk or landing-safety certification.",
+    "Registered fusion is a separately labeled research series; main LOLA gauges remain unchanged.",
+    "Internal residual checks are not independent absolute-accuracy validation."
+  ],
+  "status": "NO_QUALIFIED_PRODUCT",
+  "reason": "No covering high-resolution DEM verified in this ingestion; retain LOLA."
+}

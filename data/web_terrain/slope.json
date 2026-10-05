@@ -1,0 +1,17 @@
+{
+  "name": "slope",
+  "bounds": [
+    -12000.0,
+    -9000.0,
+    12000.0,
+    15000.0
+  ],
+  "resolution_m": 20.0,
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDSM_80S_20MPP_ADJ.TIF",
+  "sha256": "4844a2071b9d04c6870244740fb38beb783df4804a625a050d1fedaddf5229df",
+  "shape": [
+    1200,
+    1200
+  ],
+  "sampling": "bilinear"
+}

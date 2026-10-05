@@ -1,0 +1,9 @@
+# Science snapshots are byte-addressed by SHA-256: never normalize them.
+outputs/** -text
+data/** -text
+apps/web/public/** -text
+*.csv whitespace=cr-at-eol
+*.npy binary
+*.png binary
+*.jpg binary
+*.pdf binary

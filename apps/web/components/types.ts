@@ -62,18 +62,55 @@ export interface PowerState {
   estimated_electrical_output_w: number;
 }
 
+export interface CommsPotential {
+  model: "earth_center_terrain_clearance_v1";
+  classification: "BLOCKED" | "MARGINAL" | "CLEAR";
+  potential_index_percent: 0 | 30 | 100;
+  center_clear: boolean;
+  low_elevation_threshold_deg: number;
+}
+
 export interface SimulationSample {
   timestamp: string;
   sun: BodyState;
   earth: BodyState;
   power: PowerState;
+  power_scenarios?: Record<string, PowerState>;
   geometric_dte_available: boolean;
+  comms_potential: CommsPotential;
   combined_state: string;
+}
+
+export interface IndexedSite {
+  id: string;
+  name: string;
+  latitude_deg: number;
+  longitude_deg_east: number;
+  kind: "validation" | "candidate";
+  region_status: "current_2024_cohort" | "historical_2022_cohort" | null;
+  coordinate_source_url: string | null;
+  data_url: string;
+  sha256: string;
+  summary: {
+    sunlight_percentage: number;
+    earth_visible_percentage: number;
+  };
+}
+
+export interface SimulationIndex {
+  schema_version: "1.0.0";
+  sites: IndexedSite[];
 }
 
 export interface HorizonPoint {
   azimuth_deg: number;
   elevation_deg: number;
+  obstruction_distance_m: number;
+}
+
+export interface HorizonMaskPoint {
+  azimuth_deg: number;
+  minimum_clearance_elevation_deg: number;
   obstruction_distance_m: number;
 }
 
@@ -142,9 +179,14 @@ export interface SimulationResult {
     efficiency: number;
     orientation_mode: string;
   };
+  panel_scenarios?: Record<string, { description?: string; [key: string]: unknown }>;
   horizon: {
     metadata: Record<string, unknown>;
     profile: HorizonPoint[];
+  };
+  horizon_mask?: {
+    metadata: Record<string, unknown>;
+    profile: HorizonMaskPoint[];
   };
   samples: SimulationSample[];
   windows: {

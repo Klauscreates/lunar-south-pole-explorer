@@ -61,7 +61,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--panel-efficiency", type=float, default=0.30)
     parser.add_argument(
         "--panel-mode",
-        choices=["sun_tracking", "horizontal_fixed", "custom_normal"],
+        choices=[
+            "sun_tracking",
+            "horizontal_fixed",
+            "custom_normal",
+            "fixed_tilt",
+            "gimbal_limited",
+        ],
         default="sun_tracking",
     )
     parser.add_argument(
@@ -71,6 +77,22 @@ def build_parser() -> argparse.ArgumentParser:
         metavar=("E", "N", "U"),
         default=(0.0, 0.0, 1.0),
     )
+    parser.add_argument(
+        "--panel-tilt-deg",
+        type=float,
+        default=0.0,
+        help="Fixed panel tilt from horizontal; 90 degrees is vertical",
+    )
+    parser.add_argument(
+        "--panel-azimuth-deg",
+        type=float,
+        default=0.0,
+        help="Fixed panel outward-normal azimuth, clockwise from north",
+    )
+    parser.add_argument("--gimbal-tilt-min-deg", type=float, default=0.0)
+    parser.add_argument("--gimbal-tilt-max-deg", type=float, default=90.0)
+    parser.add_argument("--gimbal-azimuth-center-deg", type=float, default=0.0)
+    parser.add_argument("--gimbal-azimuth-half-range-deg", type=float, default=180.0)
     parser.add_argument(
         "--output-json", default=str(WORKSPACE / "outputs" / "simulation.json")
     )
@@ -113,6 +135,12 @@ def config_from_args(args: argparse.Namespace) -> SimulationConfig:
             efficiency=args.panel_efficiency,
             orientation_mode=args.panel_mode,
             custom_normal_enu=tuple3(args.panel_normal_enu),
+            tilt_deg_from_horizontal=args.panel_tilt_deg,
+            azimuth_deg=args.panel_azimuth_deg,
+            tracking_tilt_min_deg=args.gimbal_tilt_min_deg,
+            tracking_tilt_max_deg=args.gimbal_tilt_max_deg,
+            tracking_azimuth_center_deg=args.gimbal_azimuth_center_deg,
+            tracking_azimuth_half_range_deg=args.gimbal_azimuth_half_range_deg,
         ),
     )
 

@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "status": "COMPONENT_SELECTION_NOT_ASSEMBLY_VALIDATION",
+  "selected_cell": "Spectrolab XTJ Prime, beginning of life",
+  "source": {
+    "url": "https://www.spectrolab.com/photovoltaics/XTJ-Prime_Data_Sheet.pdf",
+    "path": "sources/xtj-prime.pdf",
+    "sha256": "1c7039c0057438409f975ead724a4bc8ffa92ede04a94b4fb661eca82249d400",
+    "revision": "2018-07-16",
+    "retrieved": "2026-10-02",
+    "scope": "Cell-level manufacturer data, not R1 assembly measurements"
+  },
+  "cell_properties": {
+    "reference_efficiency": {"value": 0.307, "unit": "1", "page": 1, "basis": "Production average over 100000 cells, BOL, AM0", "uncertainty": null},
+    "reference_temperature_k": {"value": 301.15, "unit": "K", "page": 1, "basis": "28 Celsius reference condition", "uncertainty": null},
+    "reference_irradiance_w_m2": {"value": 1353.0, "unit": "W/m2", "page": 1, "basis": "135.3 mW/cm2 AM0 reference condition", "uncertainty": null},
+    "vmp_v": {"value": 2.406, "unit": "V", "page": 1, "basis": "BOL production average", "uncertainty": null},
+    "jmp_a_m2": {"value": 175.0, "unit": "A/m2", "page": 1, "basis": "17.5 mA/cm2 BOL production average", "uncertainty": null},
+    "dvmp_dt_v_k": {"value": -0.0063, "unit": "V/K", "page": 2, "basis": "BOL coefficient, 15 to 125 Celsius", "uncertainty": null},
+    "djmp_dt_a_m2_k": {"value": 0.056, "unit": "A/m2/K", "page": 2, "basis": "5.6 microampere/cm2/Celsius BOL coefficient, 15 to 125 Celsius", "uncertainty": null},
+    "solar_absorptivity": {"value": 0.88, "unit": "1", "page": 2, "basis": "Cell thermal parameter; temperature and angular dependence not supplied", "uncertainty": null},
+    "ir_emissivity": {"value": 0.85, "unit": "1", "page": 2, "basis": "Cell emittance; not panel backside or effective assembly emittance", "uncertainty": null}
+  },
+  "coefficient_temperature_range_k": [288.15, 398.15],
+  "uncertainty_policy": "null means not supplied, never zero uncertainty; no invented confidence intervals",
+  "assembly_requirements": {
+    "cell_layout": "Select exact cell size, count, packing, series/parallel strings and bypass diodes; nominal R1 1 m2 is not a cell layout",
+    "panel_stack": "Select coverglass, adhesive, substrate and backing with thickness, mass and temperature-dependent heat capacity/conductivity",
+    "surface_finishes": "Select front and rear surface finishes; obtain assembly absorptance/emittance versus temperature, angle and aging",
+    "mounting": "Specify interface area, materials, fasteners, preload and contact-conductance test data",
+    "electrical": "Obtain cold-temperature and low-irradiance I-V data, wiring losses and MPPT operating conditions",
+    "validation": "Instrumented panel thermal-balance/vacuum test and model correlation with measured uncertainty"
+  },
+  "environment_requirements": {
+    "terrain_temperature": "Ingest versioned Diviner observations/products with footprint, quality flags and time coverage; statistics are not epoch temperatures",
+    "radiative_geometry": "Calculate terrain-to-panel view factors, mutual blockage, facet illumination and reflected/thermal incident flux",
+    "material_response": "Source terrain albedo/emissivity and thermophysical properties with resolution and uncertainty",
+    "boundary_state": "Solve mount/internal temperatures, dissipated loads, heaters and initial thermal history"
+  },
+  "environment_source_entrypoint": "https://www.diviner.ucla.edu/data",
+  "automatic_promotion_to_active_model": false
+}

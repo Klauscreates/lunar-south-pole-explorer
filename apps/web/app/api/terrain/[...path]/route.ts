@@ -17,8 +17,15 @@ export async function GET(
     );
   }
   try {
+    // Server-only configuration: never accept an upstream URL from the client.
+    // A hosted frontend must point at a hosted terrain service, not the user's Mac.
+    const origin = process.env.TERRAIN_SERVICE_URL || "http://127.0.0.1:8766";
+    const upstream = new URL(origin);
+    if (!["http:", "https:"].includes(upstream.protocol) || upstream.username || upstream.password ||
+        upstream.search || upstream.hash || upstream.pathname !== "/")
+      throw new Error("TERRAIN_SERVICE_URL must be an HTTP(S) origin without credentials or path");
     const result = await fetch(
-      `http://127.0.0.1:8766/${suffix}${request.nextUrl.search}`,
+      new URL(`/${suffix}${request.nextUrl.search}`,upstream),
       { signal: AbortSignal.timeout(20000) },
     );
     return new Response(result.body, {
@@ -34,7 +41,7 @@ export async function GET(
     return Response.json(
       {
         error:
-          "Terrain service unavailable. Run npm run planner from apps/web.",
+          "Terrain service unavailable. The operator must start or configure the terrain backend; no substitute terrain is being returned.",
       },
       { status: 503 },
     );

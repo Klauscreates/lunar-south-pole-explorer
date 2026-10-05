@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "vehicle": "Surveyor VII",
+  "status": "ARCHIVAL_EVIDENCE_ONLY",
+  "model_correlation_status": "NOT_RUN",
+  "source": {
+    "title": "Surveyor VII Mission Report, Part I: Mission Description and Performance",
+    "report": "JPL Technical Report 32-1264",
+    "publication_date": "1969-02-15",
+    "url": "https://ntrs.nasa.gov/api/citations/19690008977/downloads/19690008977.pdf",
+    "sha256": "6e30b5af05ce9d0170bac1702a5da6d999d385b1eac90bfdc0cf59403543dc89"
+  },
+  "transit": {
+    "printed_page": 64,
+    "pdf_page": 81,
+    "table": "IV-12",
+    "predicted_average_solar_power_w": 84,
+    "reported_average_solar_power_w": 89,
+    "reported_average_solar_voltage_v": 30.3,
+    "reported_average_solar_current_a": 2.93,
+    "bcr_efficiency_percent": 94.6,
+    "bcr_efficiency_evidence": "Estimated in flight; not directly measured. Do not classify as measured calibration."
+  },
+  "surface_operations": {
+    "printed_page": 65,
+    "pdf_page": 82,
+    "panel_lead_angle_deg": [15, 45],
+    "qualification": "Generally ahead of Sun for charging control and equipment shade; fully sun-oriented only in the final 24 hours of the first lunar day. No per-epoch articulation history transcribed."
+  },
+  "sunset": {
+    "printed_page": 161,
+    "pdf_page": 179,
+    "camera_sunset_utc": "1968-01-23T06:06:00Z",
+    "solar_panel_zero_output_utc": "1968-01-23T06:24:00Z",
+    "qualification": "Camera sunlight loss and panel zero output are different observables. No historical terrain/pose replay has been validated."
+  },
+  "missing_for_vehicle_prediction": [
+    "Verified dimensional mesh and per-component transforms",
+    "Epoch-aligned antenna/solar-panel joint positions",
+    "Cell I-V and temperature calibration with operating conditions",
+    "Thermal capacities, conductances and radiative view factors",
+    "Machine-readable telemetry with calibration and uncertainty",
+    "Local surface radiometry and component-height terrain masks"
+  ]
+}

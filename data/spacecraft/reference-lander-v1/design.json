@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "open_reference_lander_v1",
+  "name": "Open Reference Lander R1",
+  "status": "DESIGN_STUDY_UNVALIDATED",
+  "identity": "Project-authored reference design; not Surveyor, VIPER, or built flight hardware.",
+  "geometry_source": "The dimensions in this file define the reference design. They were not reconstructed from mission photographs.",
+  "body_frame": "+X right, +Y forward, +Z up; metres; landing-plane origin",
+  "boxes": [
+    {"id": "body", "min": [-0.5, -0.5, 0.3], "max": [0.5, 0.5, 1.1]},
+    {"id": "panel_backing", "min": [-0.5, 0.58, 0.45], "max": [0.5, 0.6, 1.45]},
+    {"id": "forward_payload", "min": [-0.3, 0.85, 0.5], "max": [0.15, 1.05, 0.85]},
+    {"id": "antenna_mast", "min": [0.22, 0.79, 0.8], "max": [0.34, 0.91, 1.9]},
+    {"id": "left_leg", "min": [-0.75, -0.4, 0.0], "max": [-0.6, 0.4, 0.4]},
+    {"id": "right_leg", "min": [0.6, -0.4, 0.0], "max": [0.75, 0.4, 0.4]}
+  ],
+  "panel": {
+    "id": "array",
+    "area_m2": 1.0,
+    "normal_body": [0, 1, 0],
+    "plane_y_m": 0.600001,
+    "x_bounds_m": [-0.5, 0.5],
+    "z_bounds_m": [0.45, 1.45],
+    "samples_per_side": 8
+  },
+  "antenna": {"id": "earth_sensor", "phase_center_m": [0.350001, 0.85, 1.75]},
+  "attitudes": [
+    {"id": "north", "label": "North · level", "yaw": 0, "pitch": 0, "roll": 0},
+    {"id": "east", "label": "East · level", "yaw": 90, "pitch": 0, "roll": 0},
+    {"id": "south", "label": "South · level", "yaw": 180, "pitch": 0, "roll": 0},
+    {"id": "west", "label": "West · level", "yaw": 270, "pitch": 0, "roll": 0},
+    {"id": "north_tilted", "label": "North · pitch +10°, roll +5°", "yaw": 0, "pitch": 10, "roll": 5}
+  ],
+  "thermal_parameters": {
+    "collecting_area_m2": 1.0,
+    "radiating_area_m2": 2.0,
+    "heat_capacity_j_k": 4500,
+    "solar_absorptivity": 0.9,
+    "ir_emissivity": 0.85,
+    "reference_efficiency": 0.3,
+    "reference_temperature_k": 298.15,
+    "efficiency_temperature_coefficient_per_k": -0.003,
+    "mount_conductance_w_k": 1.2
+  },
+  "initial_cell_temperature_k": 250,
+  "thermal_parameter_source": "Explicit study assumptions, not measured hardware properties or vendor specifications.",
+  "boundary_cases": [
+    {"id": "low_load", "label": "Low environmental load", "wall_reflected_solar_irradiance_w_m2": 0, "lunar_ir_irradiance_w_m2": 10, "mount_temperature_k": 250, "radiation_sink_temperature_k": 3},
+    {"id": "added_load", "label": "Added wall / IR load", "wall_reflected_solar_irradiance_w_m2": 20, "lunar_ir_irradiance_w_m2": 50, "mount_temperature_k": 250, "radiation_sink_temperature_k": 3}
+  ],
+  "boundary_source": "Constant panel-plane sensitivity inputs, not site measurements, terrain-derived albedo, or certified environmental bounds. Added wall illumination may persist while the local Sun is terrain-blocked; no terrain-wall illumination model is asserted.",
+  "limitations": [
+    "One temperature node and linear efficiency law; no battery, loads, wiring-string mismatch or heater controller.",
+    "Static pose with 64 panel samples and Sun/Earth center rays; no moving joints or disk-resolved structural occultation.",
+    "Uses the parent site's observer-height skyline for every component; no per-component terrain mask.",
+    "Earth result is geometric center LOS; antenna gain and RF link margin are unmodeled.",
+    "No physical test correlation, no uncertainty bounds, and no flight certification."
+  ]
+}

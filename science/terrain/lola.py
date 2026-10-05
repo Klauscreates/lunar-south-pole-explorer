@@ -158,7 +158,7 @@ def prepare_lola_crop(
         "longitude_deg_east": site.longitude_deg_east,
         "search_radius_m": config.search_radius_m,
         "lunar_radius_m": config.lunar_radius_m,
-        "algorithm": "lola-cog-square-crop-v1",
+        "algorithm": "lola-cog-square-crop-v2-projection-margin",
     }
     cache_key = hashlib.sha256(
         json.dumps(cache_key_payload, sort_keys=True).encode("utf-8")
@@ -242,7 +242,14 @@ def prepare_lola_crop(
                     )
                     pixel_size_x = abs(float(source.transform.a))
                     pixel_size_y = abs(float(source.transform.e))
-                    margin = 2.0 * max(pixel_size_x, pixel_size_y)
+                    # A geodesic radius can project slightly farther than its
+                    # ground distance in south-polar stereographic coordinates.
+                    # Leave room for that scale factor, pixel-center bilinear
+                    # sampling, and integer-rounded COG windows at every ray.
+                    margin = max(
+                        8.0 * max(pixel_size_x, pixel_size_y),
+                        0.002 * config.search_radius_m,
+                    )
                     requested = from_bounds(
                         site_x - config.search_radius_m - margin,
                         site_y - config.search_radius_m - margin,
@@ -310,7 +317,7 @@ def prepare_lola_crop(
             source_url=config.source,
             source_product=PGDA_PRODUCT_TITLE,
             source_reference_frame="MOON_ME (JPL DE421)",
-            crop_algorithm="lola-cog-square-crop-v1",
+            crop_algorithm="lola-cog-square-crop-v2-projection-margin",
         )
     temporary_crop.replace(crop_path)
 

@@ -19,6 +19,16 @@ PRE_SPICE_WINDOWS_SHA256 = (
 PRE_SPICE_CSV_SHA256 = (
     "a16bed59fafbf305437dd7e14ed9fc70faf68905dbf4294acb7503fb77ee80c0"
 )
+LEGACY_POWER_FIELDS = {
+    "geometric_sunlight_available",
+    "panel_illuminated",
+    "orientation_mode",
+    "incidence_cosine",
+    "relative_irradiance_vs_1au",
+    "direct_irradiance_w_m2",
+    "estimated_incident_power_w",
+    "estimated_electrical_output_w",
+}
 
 
 def _canonical_sha256(value):
@@ -40,10 +50,21 @@ class GeneratedResultTests(unittest.TestCase):
         cls.result = json.loads(OUTPUT.read_text(encoding="utf-8"))
 
     def test_expected_full_week_dimensions(self):
-        self.assertEqual(self.result["schema_version"], "1.1.0")
+        self.assertEqual(self.result["schema_version"], "1.3.0")
         self.assertEqual(len(self.result["samples"]), 1009)
         self.assertEqual(len(self.result["horizon"]["profile"]), 720)
+        self.assertEqual(len(self.result["horizon_mask"]["profile"]), 360)
         self.assertEqual(self.result["validation"]["overall_status"], "PASS")
+
+    def test_one_degree_mask_uses_exact_existing_rays(self):
+        full = self.result["horizon"]["profile"]
+        mask = self.result["horizon_mask"]["profile"]
+        for azimuth, point in enumerate(mask):
+            self.assertEqual(point["azimuth_deg"], azimuth)
+            self.assertEqual(
+                point["minimum_clearance_elevation_deg"],
+                full[2 * azimuth]["elevation_deg"],
+            )
 
     def test_required_local_spice_crosscheck_passes_all_epochs(self):
         validation = self.result["validation"]["independent_spice"]
@@ -62,8 +83,19 @@ class GeneratedResultTests(unittest.TestCase):
         )
 
     def test_validator_does_not_change_operational_series_windows_or_csv(self):
+        legacy_samples = []
+        for sample in self.result["samples"]:
+            legacy = {
+                key: value for key, value in sample.items()
+                if key not in {"power_scenarios", "comms_potential"}
+            }
+            legacy["power"] = {
+                key: value for key, value in sample["power"].items()
+                if key in LEGACY_POWER_FIELDS
+            }
+            legacy_samples.append(legacy)
         self.assertEqual(
-            _canonical_sha256(self.result["samples"]),
+            _canonical_sha256(legacy_samples),
             PRE_SPICE_SAMPLES_SHA256,
         )
         self.assertEqual(

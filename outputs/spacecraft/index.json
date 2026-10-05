@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "open_reference_lander_v1",
+  "sites": [
+    {
+      "site_id": "test-site-a",
+      "url": "/data/spacecraft/test-site-a.json",
+      "sha256": "cd35a0a0ba25ce1f1b9dce26f14161e8d74fd9220cc5174dd9c7b89c3cc59b52",
+      "parent_sha256": "66d3fd9e7628da7acaf1ee1f7cd8ba12ee3ffa899bb5255f053a6186ded33404"
+    },
+    {
+      "site_id": "connecting-ridge",
+      "url": "/data/spacecraft/connecting-ridge.json",
+      "sha256": "8edf23bdaf07096b8d39afde2c7b365cc1538e0732a9e6d8f98fa962e0db9092",
+      "parent_sha256": "5d964f2221005bbeae8050e680e821e9eba7adc625ec4fb67db7a99d02eafccb"
+    },
+    {
+      "site_id": "haworth",
+      "url": "/data/spacecraft/haworth.json",
+      "sha256": "6d90574048a676ab120b56c62c620b8120ab674bcd1fee65a62dc85b64984448",
+      "parent_sha256": "154e4f08c97cbb05dadefe87e73dddc552c05d032c34745bd036a173eb0f6950"
+    },
+    {
+      "site_id": "malapert-massif",
+      "url": "/data/spacecraft/malapert-massif.json",
+      "sha256": "fb661140d2e3f6eb2f39b031430e3256e921144436c7829a6f7bf5a81002cf76",
+      "parent_sha256": "c578b4e938f220391807e2e196c6aa78b568cf27274e3ef0521e558c1f2cfb7b"
+    },
+    {
+      "site_id": "nobile-rim-1",
+      "url": "/data/spacecraft/nobile-rim-1.json",
+      "sha256": "f426aba8b8a76723de56d0c9ce1e0a34241c20ed8aa23f3c863ddc96eec93766",
+      "parent_sha256": "dee8b389140e5aa85291e9377009efff11281b94ed47ae1ed31f472cc3aa7c10"
+    }
+  ]
+}

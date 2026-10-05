@@ -1,0 +1,30 @@
+{
+  "bounds_degrees": [
+    -180,
+    -90,
+    180,
+    -89.3
+  ],
+  "width": 4096,
+  "height": 2048,
+  "latitude_pixel_spacing_m": 10.364426414504218,
+  "purpose": "display imagery; point values sampled from source rasters",
+  "files": {
+    "local-hillshade.png": {
+      "sha256": "1882945d32dbafb2cef4081992e58d8aac004ccee83ab4d9ce5ce35af4dd43c2",
+      "bytes": 5159423
+    },
+    "local-slope.png": {
+      "sha256": "8e21b6763a05bb72e0c402344a7dbd64697659e8e888b340206764e4a1662f25",
+      "bytes": 7890867
+    },
+    "local-psr.png": {
+      "sha256": "9f7094db60b5668ffc66ad06fcfed1d393f6ca521cbff42e217e713a799617b5",
+      "bytes": 224543
+    },
+    "local-height_error.png": {
+      "sha256": "f80133c9f60df17722e39d9492130278a287f9cabe2f9f8836b71d0262a9bf80",
+      "bytes": 6262576
+    }
+  }
+}
