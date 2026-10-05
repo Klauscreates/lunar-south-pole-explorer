@@ -25,14 +25,15 @@ git clone https://github.com/Klauscreates/lunar-south-pole-explorer.git
 cd lunar-south-pole-explorer
 python3 -m venv .venv
 .venv/bin/python -m pip install -e '.[dev]'
-npm --prefix apps/web ci
-npm --prefix apps/web run build
-npm --prefix apps/web run planner -- --production
+cd apps/web
+npm ci
+npm run build
+npm run planner -- --production
 ```
 
 Open **http://127.0.0.1:3000**. The launcher starts Next.js and the read-only Python terrain service together. Keep the terminal running; Ctrl+C stops both. Dependency installation needs internet access. Installation copies Cesium workers; the build verifies and copies the committed study exports.
 
-For development, use `npm --prefix apps/web run planner`. Do not run terrain preprocessing merely to view this snapshot: the required bounded grids and imagery are included.
+For development, use `npm run planner` from `apps/web`. Do not run terrain preprocessing merely to view this snapshot: the required bounded grids and imagery are included. The verification commands below are run from the repository root.
 
 ### First visit
 

@@ -122,8 +122,8 @@ Run the source-integrity check and live assumption audit with:
 
 The audit covers all 18 active thermal, initial-state and environmental inputs,
 plus the selected cell evidence and outstanding assembly/environment tasks.
-The source PDF is cached under `sources/xtj-prime.pdf` (ignored by Git); obtain
-it from the URL in the specification to reproduce the audit on another machine.
+The source PDF is retained under `sources/xtj-prime.pdf` for checksum validation
+in the private repository; its manufacturer terms still apply.
 It fails on a changed source PDF, study checksum or stale design.
 
 All 50,450 existing scenario temperatures are outside (below) the cell
