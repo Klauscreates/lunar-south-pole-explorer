@@ -45,8 +45,3 @@
   .mission-planner .help-popover { right: 12px; left: 12px; width: auto; top: calc(76px + env(safe-area-inset-top)); max-height: 60dvh; overflow: auto; }
   .mission-planner .cesium-viewer-bottom { bottom: calc(var(--mobile-bottom) + 3px) !important; }
 }
-.camera-gesture-control { position:absolute; z-index:5; right:16px; top:calc(env(safe-area-inset-top, 0px) + 142px); display:flex; flex-wrap:wrap; max-width:230px; gap:4px; padding:6px; border:1px solid #ffffff25; border-radius:20px; background:#10131875; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
-.camera-gesture-control button { min-height:44px; border:0; border-radius:14px; padding:8px 12px; background:transparent; color:#b7bdc4; }
-.camera-gesture-control button[aria-pressed="true"] { background:#ffffff20; color:white; }
-.camera-gesture-control span { width:100%; text-align:center; font-size:10px; color:#bcc3cb; padding:0 4px 4px; }
-@media (max-width:950px) { .camera-gesture-control { top:calc(env(safe-area-inset-top, 0px) + 172px); } }

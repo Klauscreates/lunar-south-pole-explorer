@@ -8,7 +8,7 @@ export function panDistance(dx: number, dy: number, depth: number, fovy: number,
 }
 
 export function installTouchNavigation(canvas: HTMLElement, controls: {
-  mode: () => 'pan' | 'look'; interrupt: () => void;
+  interrupt: () => void;
   rotate: (enabled: boolean) => void; pan: (dx: number, dy: number) => void;
   look: (dx: number, dy: number) => void;
 }) {
@@ -24,11 +24,13 @@ export function installTouchNavigation(canvas: HTMLElement, controls: {
     const previous=touches.get(event.pointerId);
     if (!previous) return;
     touches.set(event.pointerId,{x:event.clientX,y:event.clientY});
-    // Leave two-finger gestures to Cesium's native pinch implementation.
+    // Two-finger centroid motion turns the viewing basis; finger separation
+    // still drives Cesium's native pinch zoom. No on-screen mode is needed.
     if (touches.size === 1) {
       const dx=event.clientX-previous.x, dy=event.clientY-previous.y;
-      if (controls.mode() === 'look') controls.look(dx,dy);
-      else controls.pan(dx,dy);
+      controls.pan(dx,dy);
+    } else if (touches.size === 2) {
+      controls.look((event.clientX-previous.x)/2,(event.clientY-previous.y)/2);
     }
   };
   const end = (event: PointerEvent) => { touches.delete(event.pointerId); };

@@ -116,8 +116,6 @@ export default function LunarScene({
   onSelectSite: (siteId: string) => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
-  const [navigationMode, setNavigationMode] = useState<'pan' | 'look'>('pan');
-  const navigationModeRef = useRef<'pan' | 'look'>('pan');
   const engine = useRef<Engine | null>(null);
   const pendingFlight = useRef(flight);
   const latest = useRef({
@@ -257,7 +255,6 @@ export default function LunarScene({
     navigation.inertiaSpin = .82;
     navigation.inertiaZoom = .75;
     const removeTouchNavigation = installTouchNavigation(viewer.scene.canvas, {
-      mode: () => navigationModeRef.current,
       interrupt: () => viewer.camera.cancelFlight(),
       rotate: enabled => { navigation.enableRotate = enabled; },
       pan: (dx,dy) => {
@@ -750,12 +747,6 @@ export default function LunarScene({
         aria-label="Interactive 3D lunar terrain"
       />
       {!ready && <div className="map-loading">Opening the Moon…</div>}
-      {ready && <div className="camera-gesture-control" role="group" aria-label="Touch camera controls">
-        {(['pan','look'] as const).map(mode => <button key={mode} type="button" aria-pressed={navigationMode===mode} onClick={() => {
-          navigationModeRef.current=mode; setNavigationMode(mode);
-        }}>{mode==='pan' ? '↔ Pan' : '↻ Look 360°'}</button>)}
-        <span>Drag to {navigationMode==='pan' ? 'move' : 'look'} · pinch to zoom</span>
-      </div>}
     </>
   );
 }

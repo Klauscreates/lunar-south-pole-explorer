@@ -36,6 +36,8 @@ Reproduce with `PLAYWRIGHT_MODULE` set to an installed Playwright entry point; s
 
 ### Free camera refinement
 
+Superseded UI: the Pan / Look panel was subsequently removed at the user's request. Current touch mapping in both views is one-finger pan, two-finger centroid movement for free look, and native finger-separation pinch zoom. No mode selector is rendered. Gesture tests assert the panel is absent and exercise these gestures directly.
+
 The earlier surface globe-rotation gesture is now replaced by direct screen-space panning for touch. Both home and orbital views expose Pan / Look 360° controls: Look rotates the camera's viewing basis in place, without moving the observer or clamping to a geographic pole. Pinch remains native; mouse navigation is unchanged. Pan sensitivity uses altitude near terrain and distance to the focus in orbital view, including when facing away. Existing finite-camera and terrain-floor guards remain active.
 
 Build, lint and gesture unit tests pass. The expanded 390×844 touch regression passes on the local production build: four-direction pans, repeated horizontal turns spanning 360°, vertical looking, pinch, exiting orbit and opening locations. Physical Safari interaction remains a separate acceptance check.

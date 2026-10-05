@@ -9,19 +9,19 @@ try {
   page.setDefaultTimeout(60000);
   const cdp=await context.newCDPSession(page);
   const touch=(type,points)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:points.map(([id,x,y])=>({id,x,y}))});
-  async function drag(dx,dy) {
-    await touch('touchStart',[[1,195,420]]);
-    for(let i=1;i<=12;i++) {await touch('touchMove',[[1,195+dx*i/12,420+dy*i/12]]);await page.waitForTimeout(16);}
+  async function drag(dx,dy,two=false) {
+    const points=(i)=>two ? [[1,145+dx*i/12,420+dy*i/12],[2,215+dx*i/12,420+dy*i/12]] : [[1,195+dx*i/12,420+dy*i/12]];
+    await touch('touchStart',points(0));
+    for(let i=1;i<=12;i++) {await touch('touchMove',points(i));await page.waitForTimeout(16);}
     await touch('touchEnd',[]); await page.waitForTimeout(400);
   }
   await page.goto(process.env.APP_URL || 'http://127.0.0.1:3000');
   await page.getByRole('button',{name:'Locations',exact:true}).waitFor();
   await page.locator('canvas').first().waitFor(); await page.waitForTimeout(2500);
   for(const delta of [[70,0],[-70,0],[0,70],[0,-70]]) await drag(...delta);
-  await page.getByRole('button',{name:'↻ Look 360°',exact:true}).click();
-  for(let i=0;i<12;i++) await drag(140,0);
-  for(const delta of [[0,100],[0,-100]]) await drag(...delta);
-  await page.getByRole('button',{name:'↔ Pan',exact:true}).click();
+  assert.equal(await page.getByRole('group',{name:'Touch camera controls'}).count(),0);
+  for(let i=0;i<14;i++) await drag(130,0,true);
+  for(const [x,y] of [[0,100],[0,-100]]) await drag(x,y,true);
   console.log('PASS surface touch drags in four directions without renderer failure');
   await page.getByRole('button',{name:'◌ Orbital view',exact:true}).click();
   await page.getByRole('button',{name:'Play orbital timeline'}).waitFor(); await page.waitForTimeout(2000);
@@ -30,10 +30,8 @@ try {
   const after=await page.screenshot({path:'/tmp/lunar-touch-after.png'});
   assert.notDeepEqual(before,after);
   for(const delta of [[-75,0],[0,60],[0,-60]]) await drag(...delta);
-  await page.getByRole('button',{name:'↻ Look 360°',exact:true}).click();
-  for(let i=0;i<12;i++) await drag(140,0);
-  for(const delta of [[0,100],[0,-100]]) await drag(...delta);
-  await page.getByRole('button',{name:'↔ Pan',exact:true}).click();
+  for(let i=0;i<14;i++) await drag(130,0,true);
+  for(const [x,y] of [[0,100],[0,-100]]) await drag(x,y,true);
   await touch('touchStart',[[1,155,420],[2,235,420]]);
   for(let i=1;i<=10;i++){await touch('touchMove',[[1,155-i*3,420],[2,235+i*3,420]]);await page.waitForTimeout(16);}
   await touch('touchEnd',[]);
