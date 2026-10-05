@@ -87,6 +87,8 @@ Root `run_*.py` entry points regenerate their respective studies. Read the metho
 
 Permanent cloud deployment is not yet complete. Both Next.js and the terrain backend must be hosted; a frontend-only upload is insufficient. Server-only `TERRAIN_SERVICE_URL` supports a separate backend. See [deployment requirements](docs/RELEASE_ACCEPTANCE.md). Temporary tunnel links are not permanent hosting.
 
+A single-service Docker configuration and explicit **Free** Render Blueprint are included. See [free deployment instructions and limits](docs/FREE_HOSTING.md).
+
 ## License
 
 No open-source license has been assigned to original project code. Third-party software, imagery and documents retain their respective terms. Repository visibility does not change those rights.

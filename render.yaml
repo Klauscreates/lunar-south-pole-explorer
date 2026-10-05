@@ -1,0 +1,9 @@
+# One free service: Next.js public endpoint + loopback-only Python terrain.
+services:
+  - type: web
+    name: lunar-south-pole-explorer
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/terrain/health
+    autoDeployTrigger: off

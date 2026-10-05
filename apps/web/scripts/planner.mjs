@@ -60,7 +60,7 @@ try {
         "node_modules/next/dist/bin/next",
         process.argv.includes("--production") ? "start" : "dev",
         "--hostname",
-        "127.0.0.1",
+        process.env.PLANNER_HOST || "127.0.0.1",
       ],
       { cwd: webRoot, stdio: "inherit" },
     );
