@@ -18,7 +18,8 @@
 - 134 Python tests pass (75 existing warnings).
 - ESLint and production build pass; data checksum synchronization passes.
 - Baseline live acceptance: 16 groups pass at desktop 1440×1000 and mobile 390×844.
-- Updated local acceptance: all 16 groups' assertions passed; a teardown race then failed the runner. After fixing cleanup, all four API/fault groups passed cleanly. User-flow assertions include all sites, unsupported dates, comparison configurations, orbital playback and instruments.
+- Updated local acceptance: after fixing the test teardown race, a complete rerun passed all 16 groups cleanly. User-flow assertions include all sites, unsupported dates, comparison configurations, orbital playback and instruments.
+- Render deployed `f00aa32` successfully. A full public-URL acceptance rerun passed all 16 groups, including desktop/mobile and fault injection. The hosted loading check also asserted **0 speculative candidate requests and 0 repeated study requests** (baseline 4 and 5). One warm-host run showed controls at 2,073 ms versus the earlier 2,435 ms baseline; this single uncontrolled timing is not a statistically established speedup.
 - Mobile comparison screenshot reviewed; no horizontal overflow or uncaught errors in acceptance flows.
 
 No scientific source/export bytes were changed. This check does not establish physical iPhone Safari GPU performance, sustained FPS, cellular-network performance, concurrent-user capacity, or free-host cold-start time. Render's idle sleep remains a hosting limitation.
