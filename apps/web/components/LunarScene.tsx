@@ -116,6 +116,8 @@ export default function LunarScene({
   onSelectSite: (siteId: string) => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
+  const [navigationMode, setNavigationMode] = useState<'pan' | 'look'>('pan');
+  const navigationModeRef = useRef<'pan' | 'look'>('pan');
   const engine = useRef<Engine | null>(null);
   const pendingFlight = useRef(flight);
   const latest = useRef({
@@ -255,15 +257,26 @@ export default function LunarScene({
     navigation.inertiaSpin = .82;
     navigation.inertiaZoom = .75;
     const removeTouchNavigation = installTouchNavigation(viewer.scene.canvas, {
-      orbital: () => !!latest.current.orbital,
+      mode: () => navigationModeRef.current,
       interrupt: () => viewer.camera.cancelFlight(),
       rotate: enabled => { navigation.enableRotate = enabled; },
       pan: (dx,dy) => {
         const camera=viewer.camera;
-        const depth=Math.abs(C.Cartesian3.dot(camera.position,camera.direction));
+        // Use distance to the scene center even when looking away from it.
+        // Near terrain, use altitude so panning does not leap across the Moon.
+        const depth=latest.current.orbital ? C.Cartesian3.magnitude(camera.position) : Math.max(500,camera.positionCartographic?.height ?? 500);
         const shift=panDistance(dx,dy,depth,(camera.frustum as Cesium.PerspectiveFrustum).fovy ?? NaN,viewer.scene.canvas.clientHeight);
         if (!shift) return;
         camera.moveRight(shift.right); camera.moveUp(shift.up);
+        viewer.scene.requestRender();
+      },
+      look: (dx,dy) => {
+        const height=viewer.scene.canvas.clientHeight;
+        if (!Number.isFinite(dx) || !Number.isFinite(dy) || height<=0 || Math.abs(dx)>height || Math.abs(dy)>height) return;
+        // Rotate the viewing basis, not the position: unrestricted local look,
+        // without globe-pivot snapping or geographic pole clamping.
+        viewer.camera.lookRight(-dx*Math.PI/height);
+        viewer.camera.lookUp(dy*Math.PI/height);
         viewer.scene.requestRender();
       },
     });
@@ -737,6 +750,12 @@ export default function LunarScene({
         aria-label="Interactive 3D lunar terrain"
       />
       {!ready && <div className="map-loading">Opening the Moon…</div>}
+      {ready && <div className="camera-gesture-control" role="group" aria-label="Touch camera controls">
+        {(['pan','look'] as const).map(mode => <button key={mode} type="button" aria-pressed={navigationMode===mode} onClick={() => {
+          navigationModeRef.current=mode; setNavigationMode(mode);
+        }}>{mode==='pan' ? '↔ Pan' : '↻ Look 360°'}</button>)}
+        <span>Drag to {navigationMode==='pan' ? 'move' : 'look'} · pinch to zoom</span>
+      </div>}
     </>
   );
 }

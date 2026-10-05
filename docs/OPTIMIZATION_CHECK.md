@@ -33,3 +33,9 @@ Reproduce with `PLAYWRIGHT_MODULE` set to an installed Playwright entry point; s
 - Finite-value/jump guards reject invalid pan deltas. Pointer capture, cancellation, cleanup and switching between touch/mouse or surface/orbit are handled explicitly.
 - Production build and lint pass; 26 frontend tests pass. `scripts/touch-check.mjs` exercises CDP touch swipes, pinch, orbit exit and location controls at 390×844 with no uncaught errors. Before/after screenshots confirm a 75-pixel rightward finger drag translates the Moon accordingly.
 - These are emulated Chromium touch checks, not physical iPhone Safari feel or GPU qualification. Scientific exports and terrain geometry remain unchanged.
+
+### Free camera refinement
+
+The earlier surface globe-rotation gesture is now replaced by direct screen-space panning for touch. Both home and orbital views expose Pan / Look 360° controls: Look rotates the camera's viewing basis in place, without moving the observer or clamping to a geographic pole. Pinch remains native; mouse navigation is unchanged. Pan sensitivity uses altitude near terrain and distance to the focus in orbital view, including when facing away. Existing finite-camera and terrain-floor guards remain active.
+
+Build, lint and gesture unit tests pass. The expanded 390×844 touch regression passes on the local production build: four-direction pans, repeated horizontal turns spanning 360°, vertical looking, pinch, exiting orbit and opening locations. Physical Safari interaction remains a separate acceptance check.

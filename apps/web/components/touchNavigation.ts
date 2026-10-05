@@ -8,13 +8,14 @@ export function panDistance(dx: number, dy: number, depth: number, fovy: number,
 }
 
 export function installTouchNavigation(canvas: HTMLElement, controls: {
-  orbital: () => boolean; interrupt: () => void;
+  mode: () => 'pan' | 'look'; interrupt: () => void;
   rotate: (enabled: boolean) => void; pan: (dx: number, dy: number) => void;
+  look: (dx: number, dy: number) => void;
 }) {
   const touches = new Map<number,{x:number;y:number}>();
   const down = (event: PointerEvent) => {
     controls.interrupt();
-    controls.rotate(!(event.pointerType === 'touch' && controls.orbital()));
+    controls.rotate(event.pointerType !== 'touch');
     if (event.pointerType !== 'touch') return;
     touches.set(event.pointerId,{x:event.clientX,y:event.clientY});
     canvas.setPointerCapture(event.pointerId);
@@ -24,7 +25,11 @@ export function installTouchNavigation(canvas: HTMLElement, controls: {
     if (!previous) return;
     touches.set(event.pointerId,{x:event.clientX,y:event.clientY});
     // Leave two-finger gestures to Cesium's native pinch implementation.
-    if (touches.size === 1 && controls.orbital()) controls.pan(event.clientX-previous.x,event.clientY-previous.y);
+    if (touches.size === 1) {
+      const dx=event.clientX-previous.x, dy=event.clientY-previous.y;
+      if (controls.mode() === 'look') controls.look(dx,dy);
+      else controls.pan(dx,dy);
+    }
   };
   const end = (event: PointerEvent) => { touches.delete(event.pointerId); };
   canvas.addEventListener('pointerdown',down,{capture:true});
