@@ -58,7 +58,10 @@ Raw download caches, environments, logs and unrelated media are excluded. Local 
 
 ## Verification
 
+The full Python suite requires the pinned NAIF kernels (downloaded separately, not committed). Fetch them once before testing; checksum mismatches fail closed.
+
 ```sh
+.venv/bin/python -m science.ephemeris.kernels data/kernels
 .venv/bin/python -m pytest -q
 npm --prefix apps/web run lint
 node --experimental-strip-types --test apps/web/scripts/*.test.mjs
