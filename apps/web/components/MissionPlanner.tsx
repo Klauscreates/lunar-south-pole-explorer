@@ -253,12 +253,8 @@ export function MissionPlanner() {
         setSiteIndex(indexFile);
         setSelectedSiteId(initialSite.id);
         setManifest(sources);
-        // Avoid decoding four unused multi-megabyte exports on phones.
-        if (!window.matchMedia("(max-width: 950px)").matches) {
-          for (const site of indexFile.sites) {
-            if (site.id !== initialSite.id) void loadSite(site).catch(() => {});
-          }
-        }
+        // Load other exports only on selection/comparison, on desktop too.
+        // Background decoding competed with the initial terrain and textures.
       })
       .catch((e) => {
         if (!controller.signal.aborted) setError(String(e));

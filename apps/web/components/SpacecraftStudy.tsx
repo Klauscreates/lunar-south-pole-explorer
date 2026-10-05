@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useMemo, useState } from "react";
 import type { IndexedSite } from "./types";
+import { sharedResource } from "./sharedResource";
 import "./spacecraft.css";
 
 type Vec3 = [number, number, number];
@@ -41,7 +42,13 @@ const columns = ["electrical_w", "cell_temperature_k", "efficiency", "incidence_
   "unoccluded_fraction", "earth_self_clear", "earth_terrain_clear", "earth_los_clear",
   "direct_incident_w", "reflected_incident_w"];
 
-export async function loadStudy(site: IndexedSite, signal: AbortSignal): Promise<Study> {
+const studyResource = sharedResource<Study>();
+export function loadStudy(site: IndexedSite, signal: AbortSignal): Promise<Study> {
+  return studyResource(`${site.id}:${site.sha256}`, () =>
+    fetchStudy(site, AbortSignal.timeout(60000)), signal);
+}
+
+async function fetchStudy(site: IndexedSite, signal: AbortSignal): Promise<Study> {
   const indexResponse = await fetch("/data/spacecraft/index.json", { signal, cache: "no-cache" });
   if (!indexResponse.ok) throw new Error("Reference lander catalogue unavailable");
   const catalogue = await indexResponse.json();
@@ -107,7 +114,9 @@ const DesignView = memo(function DesignView({ design, angle }: { design: Study["
 export function SpacecraftStudy({ site, sampleIndex, timestamp, onClose }: {
   site: IndexedSite; sampleIndex: number; timestamp: string; onClose: () => void;
 }) {
-  const [study, setStudy] = useState<Study | null>(null);
+  const [loadedStudy, setStudy] = useState<Study | null>(null);
+  // A different site can share identical timestamps: never show the old site's rows.
+  const study = loadedStudy?.site_id === site.id && loadedStudy.parent_sha256 === site.sha256 ? loadedStudy : null;
   const [error, setError] = useState("");
   const [pose, setPose] = useState("north");
   const [boundary, setBoundary] = useState("low_load");

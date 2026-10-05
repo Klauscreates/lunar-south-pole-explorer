@@ -206,6 +206,7 @@ export default function LunarScene({
           pending--;
         });
     };
+    const flightDuration = (seconds: number) => window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : seconds;
     const viewer = new C.Viewer(host.current, {
       globe: new C.Globe(moon),
       mapProjection: new C.GeographicProjection(moon),
@@ -480,7 +481,7 @@ export default function LunarScene({
         const point = ray && viewer.scene.globe.pick(ray, viewer.scene);
         if (point)
           viewer.camera.flyToBoundingSphere(new C.BoundingSphere(point, 0), {
-            duration: 1.8,
+            duration: flightDuration(1),
             offset: new C.HeadingPitchRange(
               viewer.camera.heading,
               -0.7,
@@ -568,18 +569,18 @@ export default function LunarScene({
       if (mode === "sky") {
         const current = latest.current.sample.earth;
         viewer.camera.flyTo({destination: C.Cartesian3.add(site, C.Matrix4.multiplyByPointAsVector(enu, new C.Cartesian3(0,0,30), new C.Cartesian3()), new C.Cartesian3()),
-          orientation: {heading:C.Math.toRadians(current.azimuth_deg),pitch:C.Math.toRadians(current.elevation_deg),roll:0}, duration:2.5});
+          orientation: {heading:C.Math.toRadians(current.azimuth_deg),pitch:C.Math.toRadians(current.elevation_deg),roll:0}, duration:flightDuration(1.5)});
         return;
       }
       if (mode === "moon")
         viewer.camera.flyTo({
           destination: C.Cartesian3.fromDegrees(10, -35, 6400000, moon),
           orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
-          duration: 2.5,
+          duration: flightDuration(1.5),
         });
       else
         viewer.camera.flyToBoundingSphere(new C.BoundingSphere(site, 0), {
-          duration: mode === "site" ? 3 : 2.2,
+          duration: flightDuration(mode === "site" ? 1.6 : 1.3),
           offset: new C.HeadingPitchRange(
             C.Math.toRadians(mode === "los" ? 155 : 25),
             C.Math.toRadians(

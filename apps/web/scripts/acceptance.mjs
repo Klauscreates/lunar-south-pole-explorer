@@ -151,6 +151,9 @@ try {
   await corrupt.getByText('Some data unavailable; missing results are Unknown.').waitFor();
   assert.match(await corrupt.locator('.location-row').first().innerText(),/Unknown energy/);
   pass('corrupted checksum cannot produce a spacecraft prediction');
+  // A failed shared request may be retried by another mounted panel. Let its
+  // interception settle before closing the page, not after the browser is gone.
+  await corrupt.unrouteAll({behavior:'wait'});
   await corrupt.close();
 } finally {await browser.close();}
 console.log(`Completed ${results.length} acceptance groups.`);

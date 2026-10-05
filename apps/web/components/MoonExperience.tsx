@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { loadStudy, type Study } from "./SpacecraftStudy";
 import { weeklyMetrics } from "./weeklyMetrics";
 import { SpacecraftControlPanel } from "./SpacecraftControlPanel";
@@ -51,9 +51,9 @@ export function MoonExperience({sites, selected, focused, viewKey, epoch, onEpoc
   },[locationsOpen,sites,selected]);
   const validReport = (site:IndexedSite) => reports[site.id]?.parent_sha256 === site.sha256 ? reports[site.id] : undefined;
   const study = validReport(selected);
-  const metric = study ? weeklyMetrics(study,scenario) : null;
+  const metric = useMemo(()=>study ? weeklyMetrics(study,scenario) : null,[study,scenario]);
   const activeRow = date.available ? study?.scenarios.find(s=>s.id===scenario)?.rows[epoch] : undefined;
-  const ranking = sites.map(site=>({site,metrics:validReport(site) ? weeklyMetrics(validReport(site)!,scenario) : null}));
+  const ranking = useMemo(()=>sites.map(site=>({site,metrics:reports[site.id]?.parent_sha256 === site.sha256 ? weeklyMetrics(reports[site.id],scenario) : null})),[sites,reports,scenario]);
   const complete = ranking.every(r=>r.metrics);
   async function choose(id:string) {
     setBusy(id);

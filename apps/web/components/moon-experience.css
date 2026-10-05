@@ -90,3 +90,13 @@
 .potential-readout:not(.is-compact) { width:340px; max-height:calc(100dvh - 160px); overflow:auto; overscroll-behavior:contain; }
 .orbital-active .potential-readout,.orbital-active .sky-disclosure { display:none!important; }
 .mission-planner:has(.moon-dock:not([hidden])) > .orbit-launch { display:none; }
+
+/* Keep keyboard navigation visible on glass, without changing pointer styling. */
+.moon-map-actions button:focus-visible,.moon-dock button:focus-visible,
+.potential-readout button:focus-visible,.orbital-panel button:focus-visible {
+  outline:2px solid #bcead8; outline-offset:3px;
+}
+.location-row:disabled { cursor:progress; opacity:.65; }
+@media(prefers-reduced-motion:reduce) {
+  .moon-dock,.potential-readout,.moon-map-actions button { transition:none!important; animation:none!important; }
+}

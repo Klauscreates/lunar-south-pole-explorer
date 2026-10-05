@@ -1,0 +1,26 @@
+# Loading and interaction polish — October 4, 2026
+
+## Findings and changes
+
+- Desktop startup fetched four unused candidate exports (22,731,401 uncompressed bytes). These now load on demand, sharing the existing validated simulation cache.
+- Closing/reopening Locations triggered five spacecraft-study downloads. Session-scoped promise deduplication now reuses validated results, keyed by site ID and parent SHA-256. Five entries maximum; failed requests are evicted for retry. Closing one panel cancels its subscription, not another panel's shared download. Network work times out after 60 seconds. Reloading the page starts a new snapshot.
+- Weekly integrations are memoized by report/configuration, not recomputed on every timeline update.
+- Spacecraft instrument rows now require the currently selected site ID and parent checksum; equal timestamps alone cannot admit the previous site's report.
+- Camera site flights shortened from 3 to 1.6 seconds; overview/sky from 2.5 to 1.5 seconds, double-click from 1.8 to 1 second. Reduced-motion preference skips these flights. Camera destinations and scientific geometry are unchanged.
+- Glass controls have visible keyboard focus. Busy location choices have progress feedback; reduced-motion panel transitions are disabled.
+- Fault-test cleanup waits for active interceptions before closing the browser, eliminating a test-only teardown race.
+
+## Evidence
+
+`scripts/loading-check.mjs` uses a fresh Chrome browser cache and counts request URLs. Initial live baseline: 4 speculative candidate requests, 5 repeat study requests. Updated local build: **0 and 0**, asserted by `EXPECT_OPTIMIZED=1`. Uncompressed sizes describe avoided parsing/input volume, not compressed network bytes. Local and cloud timings are not a controlled speed comparison; no percentage speedup is claimed.
+
+- 24 frontend tests pass, including shared-cache deduplication, cancellation isolation, checksum-key isolation, eviction and retry.
+- 134 Python tests pass (75 existing warnings).
+- ESLint and production build pass; data checksum synchronization passes.
+- Baseline live acceptance: 16 groups pass at desktop 1440×1000 and mobile 390×844.
+- Updated local acceptance: all 16 groups' assertions passed; a teardown race then failed the runner. After fixing cleanup, all four API/fault groups passed cleanly. User-flow assertions include all sites, unsupported dates, comparison configurations, orbital playback and instruments.
+- Mobile comparison screenshot reviewed; no horizontal overflow or uncaught errors in acceptance flows.
+
+No scientific source/export bytes were changed. This check does not establish physical iPhone Safari GPU performance, sustained FPS, cellular-network performance, concurrent-user capacity, or free-host cold-start time. Render's idle sleep remains a hosting limitation.
+
+Reproduce with `PLAYWRIGHT_MODULE` set to an installed Playwright entry point; set `APP_URL` for a hosted target. Run `scripts/loading-check.mjs`, `scripts/acceptance.mjs`, frontend `*.test.mjs`, lint, build and pytest as described in README.
