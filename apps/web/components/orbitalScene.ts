@@ -85,6 +85,7 @@ export function createOrbitalScene(C: typeof Cesium, viewer: Cesium.Viewer, eart
     viewer.scene.globe.show=true;
     viewer.scene.screenSpaceCameraController.maximumZoomDistance=12000000;
     viewer.scene.screenSpaceCameraController.enableCollisionDetection=true;
+    viewer.scene.screenSpaceCameraController.enableRotate=true;
     earth.orientation=new C.ConstantProperty(C.Quaternion.IDENTITY);
     viewer.camera.lookAtTransform(C.Matrix4.IDENTITY);
     return true;

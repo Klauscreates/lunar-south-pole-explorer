@@ -6,6 +6,7 @@ import type * as Cesium from "cesium";
 import { celestialRadius } from "./celestialGeometry";
 import { CELESTIAL_TEXTURES } from "./celestialAppearance";
 import { createOrbitalScene } from "./orbitalScene";
+import { installTouchNavigation, panDistance } from "./touchNavigation";
 import type { OrbitalRequest } from "./orbitalData";
 import type { BodyState, IndexedSite, SimulationResult, SimulationSample } from "./types";
 
@@ -249,6 +250,23 @@ export default function LunarScene({
     viewer.shadowMap.size = 2048;
     viewer.scene.screenSpaceCameraController.minimumZoomDistance = 500;
     viewer.scene.screenSpaceCameraController.maximumZoomDistance = 12000000;
+    const navigation = viewer.scene.screenSpaceCameraController;
+    navigation.rotateEventTypes = [C.CameraEventType.LEFT_DRAG];
+    navigation.inertiaSpin = .82;
+    navigation.inertiaZoom = .75;
+    const removeTouchNavigation = installTouchNavigation(viewer.scene.canvas, {
+      orbital: () => !!latest.current.orbital,
+      interrupt: () => viewer.camera.cancelFlight(),
+      rotate: enabled => { navigation.enableRotate = enabled; },
+      pan: (dx,dy) => {
+        const camera=viewer.camera;
+        const depth=Math.abs(C.Cartesian3.dot(camera.position,camera.direction));
+        const shift=panDistance(dx,dy,depth,(camera.frustum as Cesium.PerspectiveFrustum).fovy ?? NaN,viewer.scene.canvas.clientHeight);
+        if (!shift) return;
+        camera.moveRight(shift.right); camera.moveUp(shift.up);
+        viewer.scene.requestRender();
+      },
+    });
     viewer.scene.screenSpaceCameraController.tiltEventTypes = [
       C.CameraEventType.RIGHT_DRAG,
       {
@@ -699,6 +717,7 @@ export default function LunarScene({
       disposed = true;
       controller.abort();
       clearInterval(stats);
+      removeTouchNavigation();
       viewer.scene.preRender.removeEventListener(guardCamera);
       engine.current = null;
       if (!viewer.isDestroyed()) viewer.destroy();

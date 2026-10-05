@@ -1,5 +1,6 @@
 /* Phone/tablet sheets remain non-modal: Globe and navigation always dismiss them.
    dvh follows Safari toolbars; safe-area insets protect the island/home indicator. */
+.lunar-canvas canvas { touch-action:none; user-select:none; -webkit-user-select:none; }
 @media (max-width: 950px) {
   .mission-planner { height: 100dvh; font-size: 14px; --mobile-bottom: calc(72px + env(safe-area-inset-bottom)); }
   .mission-planner .lunar-canvas { inset: 0; touch-action: none; }

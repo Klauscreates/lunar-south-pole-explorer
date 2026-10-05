@@ -25,3 +25,11 @@
 No scientific source/export bytes were changed. This check does not establish physical iPhone Safari GPU performance, sustained FPS, cellular-network performance, concurrent-user capacity, or free-host cold-start time. Render's idle sleep remains a hosting limitation.
 
 Reproduce with `PLAYWRIGHT_MODULE` set to an installed Playwright entry point; set `APP_URL` for a hosted target. Run `scripts/loading-check.mjs`, `scripts/acceptance.mjs`, frontend `*.test.mjs`, lint, build and pytest as described in README.
+
+## Touch navigation follow-up
+
+- One finger rotates the lunar surface naturally; orbital view uses depth-scaled screen-space panning in all four directions. Two fingers remain delegated to Cesium's native pinch controls.
+- Touching the canvas immediately cancels a camera fly-in. Canvas-only touch handling prevents browser scrolling from stealing gestures without disabling panel scrolling. Surface rotation and zoom inertia are shortened for more responsive stopping.
+- Finite-value/jump guards reject invalid pan deltas. Pointer capture, cancellation, cleanup and switching between touch/mouse or surface/orbit are handled explicitly.
+- Production build and lint pass; 26 frontend tests pass. `scripts/touch-check.mjs` exercises CDP touch swipes, pinch, orbit exit and location controls at 390×844 with no uncaught errors. Before/after screenshots confirm a 75-pixel rightward finger drag translates the Moon accordingly.
+- These are emulated Chromium touch checks, not physical iPhone Safari feel or GPU qualification. Scientific exports and terrain geometry remain unchanged.
