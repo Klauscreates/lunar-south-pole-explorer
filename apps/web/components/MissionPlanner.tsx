@@ -133,7 +133,7 @@ async function loadSimulation(site: IndexedSite, signal: AbortSignal) {
   if (result.schema_version !== "1.3.0" ||
       result.validation?.independent_spice?.status !== "PASS" ||
       result.provenance_contract?.validator_used_for_operational_samples !== false ||
-      result.samples?.length !== 1009 ||
+      result.samples?.length !== 13249 ||
       result.time_range?.sample_count !== result.samples.length ||
       result.horizon?.profile?.length !== 720 ||
       result.horizon_mask?.profile?.length !== 360 ||
@@ -215,7 +215,11 @@ export function MissionPlanner() {
   const running = playing && !ended;
   const loadSite = useCallback((site: IndexedSite) => {
     const existing = dataCache.current.get(site.id);
-    if (existing) return existing;
+    if (existing) {
+      dataCache.current.delete(site.id);
+      dataCache.current.set(site.id, existing);
+      return existing;
+    }
     const controller = lifetimeController.current;
     if (!controller) return Promise.reject(new Error("Simulation loader is not ready"));
     const pending = loadSimulation(site, controller.signal).catch((error) => {
@@ -224,6 +228,9 @@ export function MissionPlanner() {
       throw error;
     });
     dataCache.current.set(site.id, pending);
+    // Quarter-length exports are substantial. Retain only the two most
+    // recently loaded sites; active React state still owns its current data.
+    if (dataCache.current.size > 2) dataCache.current.delete(dataCache.current.keys().next().value!);
     return pending;
   }, []);
   useEffect(() => {
@@ -395,7 +402,7 @@ export function MissionPlanner() {
   return (
     <main className={`mission-planner ${instruments ? "instruments-mode" : "map-experience"} ${orbitalOpen ? "orbital-active" : ""}`} data-mobile-sheet={mobileSheet}>
       <div style={{display:orbitalOpen || instruments ? "none":"contents"}}><MoonExperience sites={siteIndex.sites} selected={selectedEntry} onSelect={selectSite}
-        epoch={index} onEpoch={next=>{setPlaying(false);scrub(next);}} loadSimulation={loadSimulation}
+        epoch={index} onEpoch={next=>{setPlaying(false);scrub(next);}} loadSimulation={loadSite}
         focused={status.focusedSiteId === selectedEntry.id && flight.mode !== "moon"}
         viewKey={`${selectedEntry.id}:${flight.id}`}
         onGlobe={()=>fly("moon")} onSky={()=>fly("sky")} onDetails={()=>{setInstruments(true);setMobileSheet("gauges");}}/></div>

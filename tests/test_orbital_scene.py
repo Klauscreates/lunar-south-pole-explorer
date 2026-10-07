@@ -13,7 +13,7 @@ def test_orbital_positions_and_attitude_match_inertial_spice_chain():
     data=json.loads((ROOT/'outputs/orbital-scene.json').read_text())
     kernels=KernelRepository(ROOT/'data/kernels',auto_download=False).resolve()
     with _isolated_kernel_pool(spice,kernels):
-        for i in (0,144,504,1008):
+        for i in (0,144,504,1008,4464,8784,13248):
             row=data['samples'][i]
             et=spice.str2et(row['utc'])
             rotation=spice.pxform(data['frame'],'J2000',et)

@@ -10,7 +10,8 @@ Explore the Moon, compare evaluated south-pole points, and visualize how sunligh
 
 - Interactive Cesium Moon, terrain inspection and apparent Sun/Earth sky view.
 - Five evaluated points: Connecting Ridge, Haworth, Malapert Massif, Nobile Rim 1, and the neutral **Test Site A** validation coordinate—not five certified landing sites.
-- **October 1, 00:00 → October 8, 00:00, 2026 UTC**, with 1,009 ten-minute epochs per point. Unsupported dates remain unavailable.
+- **October 1–December 31, 2026 UTC**, with 13,249 ten-minute epochs per point (final boundary: January 1, 2027 at 00:00 UTC). Unsupported dates remain unavailable.
+- Liquid-glass mission planner with month shortcuts, custom cross-month windows, and interval-specific visual energy/visibility cards.
 - Synchronized dual-site comparison, modeled generation, Earth-center visibility, disk exposure and thermal-model limitations.
 - Reference lander R1: five attitudes and two assumed thermal environments—not exact flight hardware.
 - SPICE-driven orbital view with 4K Earth/Sun textures. Displayed sizes and distances are compressed, not to scale.
@@ -37,8 +38,8 @@ For development, use `npm run planner` from `apps/web`. Do not run terrain prepr
 
 ### First visit
 
-1. Open **Locations** and select a point.
-2. Expand its name card and scrub the UTC timeline. Instantaneous values and whole-week totals are labeled separately.
+1. Open **Plan your mission**, pick UTC dates, then choose a location from its energy and visibility cards.
+2. Expand its name card and scrub the UTC timeline. Instantaneous values and selected-window totals are labeled separately.
 3. Choose **Compare this location** and pick a second point.
 4. Open **How to use · methods & data** for limits, or **＋** for detailed instruments.
 
@@ -55,6 +56,20 @@ For development, use `npm run planner` from `apps/web`. Do not run terrain prepr
 | `docs/` | Methods, provenance, limits and acceptance evidence |
 
 Raw download caches, environments, logs and unrelated media are excluded. Local paths retained in provenance describe the generating machine; they are not runtime requirements. Kernels are downloaded separately using `science/ephemeris/kernels.lock.json`.
+
+### Rebuilding date coverage
+
+With the pinned kernels, source DEMs, and vehicle evidence already acquired:
+
+```sh
+.venv/bin/python run_candidate_array.py --end 2027-01-01T00:00:00Z
+.venv/bin/python run_reference_lander.py
+.venv/bin/python run_local_terrain.py
+.venv/bin/python -m scripts.export_orbital_scene
+npm --prefix apps/web run build
+```
+
+Horizons requests are batched into at most 9,000 epochs, with raw provenance retained and contiguous timestamps checked. The independent SPICE comparison runs over every epoch. Thermal states are integrated continuously from October 1, not restarted at month boundaries. Reference-design environmental loads remain assumptions, not measured lunar conditions. Extended coverage is not a new terrain-accuracy or flight-certification claim.
 
 ## Verification
 

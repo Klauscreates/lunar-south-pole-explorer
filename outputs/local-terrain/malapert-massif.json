@@ -1,13 +1,13 @@
 {
   "schema_version": "1.1.0",
   "site_id": "malapert-massif",
-  "parent_sha256": "c578b4e938f220391807e2e196c6aa78b568cf27274e3ef0521e558c1f2cfb7b",
+  "parent_sha256": "772f50c8677207f734d9cbae64ff3f6888e4f80007c09e3e12ddb843a7401231",
   "manifest_sha256": "235eceec400c85d075fb010b9749500a41a10fb1aa3f396b4eefeba383606922",
   "landing_safety_certified": false,
   "operational_visibility_changed": false,
   "implementation_sha256": {
     "run_local_terrain.py": "2f1f14e86e22f0750c751773166168f667b5fd4261cb62c88d473f0bb48b5161",
-    "science/terrain/nearfield.py": "0ef35f7ed85d0c3021faadafe792cf8b914fa052ea0ecb785642040a109d39d2"
+    "science/terrain/nearfield.py": "03c7df9049886871db21f94cfe2265e558a342285560c5855430fe1b95da8f48"
   },
   "limitations": [
     "No verified boulder inventory or sub-meter hazard completeness.",

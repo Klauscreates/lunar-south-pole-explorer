@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0.0",
-  "generated_utc": "2026-10-01T10:24:46Z",
+  "generated_utc": "2026-10-07T15:28:36Z",
   "time_range": {
     "start_utc": "2026-10-01T00:00:00Z",
-    "end_utc": "2026-10-08T00:00:00Z",
+    "end_utc": "2027-01-01T00:00:00Z",
     "step_minutes": 10,
-    "sample_count": 1009,
+    "sample_count": 13249,
     "window_boundary_precision_minutes": 10
   },
   "coordinate_note": "NASA Data Book points are centers of original DEM polygons, not certified touchdown sites. Connecting Ridge is a historical 2022 candidate; the other three are in NASA's 2024 nine-region cohort.",
@@ -19,10 +19,10 @@
       "region_status": null,
       "coordinate_source_url": null,
       "data_url": "/data/simulation.json",
-      "sha256": "66d3fd9e7628da7acaf1ee1f7cd8ba12ee3ffa899bb5255f053a6186ded33404",
+      "sha256": "c549179234459f6dc8b29b9fec4c76d0b06dcec312faaa182768d00c46c73bdf",
       "summary": {
-        "sunlight_percentage": 68.551587,
-        "earth_visible_percentage": 91.865079
+        "sunlight_percentage": 49.750906,
+        "earth_visible_percentage": 52.755133
       }
     },
     {
@@ -34,10 +34,10 @@
       "region_status": "historical_2022_cohort",
       "coordinate_source_url": "https://ntrs.nasa.gov/api/citations/20250002845/downloads/M2M-30044%20Lunar%20Surface%20Data%20Book%20Baseline_Final.pdf?attachment=true",
       "data_url": "/data/connecting-ridge.json",
-      "sha256": "5d964f2221005bbeae8050e680e821e9eba7adc625ec4fb67db7a99d02eafccb",
+      "sha256": "b6b1e8ebdb322375efeb7a96ad940da793dc286fc02ff7fa275342222a8cefbd",
       "summary": {
-        "sunlight_percentage": 56.150794,
-        "earth_visible_percentage": 86.507937
+        "sunlight_percentage": 80.84994,
+        "earth_visible_percentage": 47.161836
       }
     },
     {
@@ -49,10 +49,10 @@
       "region_status": "current_2024_cohort",
       "coordinate_source_url": "https://ntrs.nasa.gov/api/citations/20250002845/downloads/M2M-30044%20Lunar%20Surface%20Data%20Book%20Baseline_Final.pdf?attachment=true",
       "data_url": "/data/haworth.json",
-      "sha256": "154e4f08c97cbb05dadefe87e73dddc552c05d032c34745bd036a173eb0f6950",
+      "sha256": "2a118e7ad99e308b080296024546e17ed64671011a840ca3545901bc01f189f4",
       "summary": {
-        "sunlight_percentage": 63.988095,
-        "earth_visible_percentage": 76.09127
+        "sunlight_percentage": 38.262379,
+        "earth_visible_percentage": 42.028986
       }
     },
     {
@@ -64,10 +64,10 @@
       "region_status": "current_2024_cohort",
       "coordinate_source_url": "https://ntrs.nasa.gov/api/citations/20250002845/downloads/M2M-30044%20Lunar%20Surface%20Data%20Book%20Baseline_Final.pdf?attachment=true",
       "data_url": "/data/malapert-massif.json",
-      "sha256": "c578b4e938f220391807e2e196c6aa78b568cf27274e3ef0521e558c1f2cfb7b",
+      "sha256": "772f50c8677207f734d9cbae64ff3f6888e4f80007c09e3e12ddb843a7401231",
       "summary": {
-        "sunlight_percentage": 0.0,
-        "earth_visible_percentage": 86.111111
+        "sunlight_percentage": 50.294384,
+        "earth_visible_percentage": 48.112923
       }
     },
     {
@@ -79,10 +79,10 @@
       "region_status": "current_2024_cohort",
       "coordinate_source_url": "https://ntrs.nasa.gov/api/citations/20250002845/downloads/M2M-30044%20Lunar%20Surface%20Data%20Book%20Baseline_Final.pdf?attachment=true",
       "data_url": "/data/nobile-rim-1.json",
-      "sha256": "dee8b389140e5aa85291e9377009efff11281b94ed47ae1ed31f472cc3aa7c10",
+      "sha256": "c72010f994de393b18db912b0a4eea328ec2914fa01be1b19976950dbab9c300",
       "summary": {
-        "sunlight_percentage": 0.0,
-        "earth_visible_percentage": 55.853175
+        "sunlight_percentage": 35.31099,
+        "earth_visible_percentage": 35.597826
       }
     }
   ]

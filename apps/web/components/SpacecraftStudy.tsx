@@ -169,7 +169,7 @@ export function SpacecraftStudy({ site, sampleIndex, timestamp, onClose }: {
             <small>Terrain {row[6]?"clear":"blocked"} · structure {row[5]?"clear":"blocked"}; RF unassessed</small></div>
         </dl></div>
         <div className="study-chart"><span>MODELED POWER OVER THE EVALUATED WEEK · MAX {chart.maximum.toFixed(1)} W</span>
-          <svg viewBox="0 0 600 85" role="img" aria-label="Reference lander weekly power with selected epoch marker">
+          <svg viewBox="0 0 600 85" role="img" aria-label="Reference lander coverage-wide power with selected epoch marker">
             <polyline fill="none" stroke="#a8c6df" strokeWidth="1.5" points={chart.points} />
             <line x1={sampleIndex*600/Math.max(1,scenario!.rows.length-1)} x2={sampleIndex*600/Math.max(1,scenario!.rows.length-1)} y1="3" y2="82" stroke="#e0b86b" />
           </svg><small>Use the main timeline below to inspect any epoch.</small>

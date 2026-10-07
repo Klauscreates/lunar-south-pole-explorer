@@ -5,32 +5,32 @@
     {
       "site_id": "test-site-a",
       "url": "/data/spacecraft/test-site-a.json",
-      "sha256": "cd35a0a0ba25ce1f1b9dce26f14161e8d74fd9220cc5174dd9c7b89c3cc59b52",
-      "parent_sha256": "66d3fd9e7628da7acaf1ee1f7cd8ba12ee3ffa899bb5255f053a6186ded33404"
+      "sha256": "a77b4ad603b5bd36713756cfbde5ad7b73dc6aec07318c518c8bc3018faba636",
+      "parent_sha256": "c549179234459f6dc8b29b9fec4c76d0b06dcec312faaa182768d00c46c73bdf"
     },
     {
       "site_id": "connecting-ridge",
       "url": "/data/spacecraft/connecting-ridge.json",
-      "sha256": "8edf23bdaf07096b8d39afde2c7b365cc1538e0732a9e6d8f98fa962e0db9092",
-      "parent_sha256": "5d964f2221005bbeae8050e680e821e9eba7adc625ec4fb67db7a99d02eafccb"
+      "sha256": "b753baa7c0e9d6582e96dacd6a799d475920555346a802296dd06eda3cf5c0e9",
+      "parent_sha256": "b6b1e8ebdb322375efeb7a96ad940da793dc286fc02ff7fa275342222a8cefbd"
     },
     {
       "site_id": "haworth",
       "url": "/data/spacecraft/haworth.json",
-      "sha256": "6d90574048a676ab120b56c62c620b8120ab674bcd1fee65a62dc85b64984448",
-      "parent_sha256": "154e4f08c97cbb05dadefe87e73dddc552c05d032c34745bd036a173eb0f6950"
+      "sha256": "497aeddac5167f5edffb0c97ba8696a032c5d59357320e829b4dd7bf5b3e4d45",
+      "parent_sha256": "2a118e7ad99e308b080296024546e17ed64671011a840ca3545901bc01f189f4"
     },
     {
       "site_id": "malapert-massif",
       "url": "/data/spacecraft/malapert-massif.json",
-      "sha256": "fb661140d2e3f6eb2f39b031430e3256e921144436c7829a6f7bf5a81002cf76",
-      "parent_sha256": "c578b4e938f220391807e2e196c6aa78b568cf27274e3ef0521e558c1f2cfb7b"
+      "sha256": "011330d7dbe370ae94b99ea8834e46ad10c0d1be19f4c20b61d6f7c38b06422d",
+      "parent_sha256": "772f50c8677207f734d9cbae64ff3f6888e4f80007c09e3e12ddb843a7401231"
     },
     {
       "site_id": "nobile-rim-1",
       "url": "/data/spacecraft/nobile-rim-1.json",
-      "sha256": "f426aba8b8a76723de56d0c9ce1e0a34241c20ed8aa23f3c863ddc96eec93766",
-      "parent_sha256": "dee8b389140e5aa85291e9377009efff11281b94ed47ae1ed31f472cc3aa7c10"
+      "sha256": "9f0d8bfa706575245cbe4d9553afee5f037e47692c751964d30139374e5cbbbe",
+      "parent_sha256": "c72010f994de393b18db912b0a4eea328ec2914fa01be1b19976950dbab9c300"
     }
   ]
 }

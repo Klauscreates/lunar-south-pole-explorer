@@ -12,7 +12,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -49,6 +49,7 @@ class HorizonsEphemerisProvider(EphemerisProvider):
         terrain_elevation_m: float,
         time_range: TimeRangeConfig,
     ) -> Tuple[List[EphemerisSample], Dict[str, Any]]:
+        time_range.validate()
         return self._get("10", "Sun", site, terrain_elevation_m, time_range)
 
     def get_earth_positions(
@@ -57,6 +58,7 @@ class HorizonsEphemerisProvider(EphemerisProvider):
         terrain_elevation_m: float,
         time_range: TimeRangeConfig,
     ) -> Tuple[List[EphemerisSample], Dict[str, Any]]:
+        time_range.validate()
         return self._get("399", "Earth", site, terrain_elevation_m, time_range)
 
     def _get(
@@ -67,6 +69,31 @@ class HorizonsEphemerisProvider(EphemerisProvider):
         terrain_elevation_m: float,
         time_range: TimeRangeConfig,
     ) -> Tuple[List[EphemerisSample], Dict[str, Any]]:
+        # Bound each upstream table independently and retain every raw response.
+        # Adjacent requests do not overlap; validation below checks the full grid.
+        step = timedelta(minutes=time_range.step_minutes)
+        if (time_range.end_utc-time_range.start_utc) // step + 1 > 9000:
+            rows, batches = [], []
+            cursor = time_range.start_utc
+            while cursor <= time_range.end_utc:
+                end = min(cursor + 8999*step, time_range.end_utc)
+                # Horizons requires STOP_TIME after START_TIME. Leave two
+                # epochs, not a singleton, for the final upstream request.
+                if time_range.end_utc-end == step:
+                    end -= step
+                samples, metadata = self._get(target_id, target_name, site, terrain_elevation_m,
+                    TimeRangeConfig(cursor,end,time_range.step_minutes))
+                rows.extend(samples); batches.append(metadata)
+                cursor = end + step
+            expected = (time_range.end_utc-time_range.start_utc)//step+1
+            if len(rows)!=expected or any(row.timestamp!=time_range.start_utc+i*step for i,row in enumerate(rows)):
+                raise EphemerisError('Batched Horizons timestamps are incomplete or unordered')
+            if any(batch['ephemeris_source']!=batches[0]['ephemeris_source'] for batch in batches):
+                raise EphemerisError('Batched Horizons ephemeris sources disagree')
+            return rows, {'provider':'NASA/JPL Horizons','provider_url':HORIZONS_API_URL,
+                          'target_id':target_id,'target_name':target_name,
+                          'ephemeris_source':batches[0]['ephemeris_source'],
+                          'batch_count':len(batches),'batches':batches}
         altitude_km = (terrain_elevation_m + site.observer_height_m) / 1000.0
         params = self._build_params(
             target_id, site, altitude_km, time_range

@@ -106,3 +106,52 @@
 .mission-date-selection button { min-height:44px; }
 .mission-date-selection button:disabled { opacity:.4; cursor:not-allowed; }
 @media(max-width:480px) { .mission-planner .moon-map-actions button { font-size:12px; padding:8px 10px; } .moon-map-actions { gap:5px; } }
+
+/* One frosted surface; lightweight translucent tiles avoid stacked mobile blur. */
+.moon-dock,.moon-dock.is-dual,.potential-readout {
+  background:linear-gradient(135deg,#64778042 0%,#202b37b8 42%,#0b1018c9 100%);
+  border:1px solid #e3f5ff38;
+  box-shadow:inset 0 1px 1px #fff4,inset 0 -1px 1px #fff1,0 24px 70px #0008;
+  backdrop-filter:blur(32px) saturate(135%);
+  -webkit-backdrop-filter:blur(32px) saturate(135%);
+  scrollbar-width:thin; scrollbar-color:#ffffff40 transparent;
+}
+.mission-date-selection { gap:12px; }
+.mission-date-selection p { margin:0; }
+.mission-date-selection h2 { font-size:30px; letter-spacing:-1px; margin:4px 0 0; }
+.mission-date-heading { display:flex; align-items:center; gap:16px; }.mission-date-heading h2 { font-size:27px; }
+.mission-stepper { display:flex; align-items:center; gap:10px; font-size:10px; letter-spacing:.8px; text-transform:uppercase; color:#a5b3c0; }
+.mission-stepper i { height:1px; flex:1; background:linear-gradient(90deg,#bdeedd80,#ffffff10); }
+.mission-stepper .active { color:#c5f6e5; }
+.mission-calendar-mark { flex-shrink:0; display:grid; width:68px; text-align:center; border:1px solid #fff4; border-radius:18px; padding:8px 4px; margin:4px 0; background:linear-gradient(140deg,#b8edff20,#ffffff03); box-shadow:inset 0 1px #fff3,0 8px 24px #0002; }
+.mission-calendar-mark > span { font-size:10px; color:#c8dbdf; letter-spacing:2px; }
+.mission-calendar-mark strong { font-size:29px; font-weight:500; letter-spacing:-1px; }
+.mission-calendar-mark small { font-size:8px; letter-spacing:1px; color:#b9d5d0; }
+.mission-months { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+.mission-planner .mission-months button { border-radius:14px; font-size:12px; padding:8px 4px; background:#ffffff08; border:1px solid #ffffff24; transition:background .2s,border-color .2s; }
+.mission-planner .mission-months button[aria-pressed="true"] { color:#d8fff0; background:#b5f5d921; border-color:#c4ffe77a; }
+.mission-date-selection label { margin:0; font-size:11px; }
+.mission-date-selection input { min-height:48px; font-size:16px; background:#0002; border-color:#ffffff29; }
+.mission-window-preview { display:grid; grid-template-columns:1fr auto; gap:10px; padding:13px 15px; border:1px solid #ffffff1f; background:#ffffff05; border-radius:16px; }
+.mission-window-preview > span { font-size:11px; color:#bdcad5; }.mission-window-preview strong { font-size:12px; font-weight:500; color:#ceefdf; font-variant-numeric:tabular-nums; }
+.mission-window-track { grid-column:1/-1; height:5px; background:#ffffff10; position:relative; border-radius:5px; overflow:hidden; }
+.mission-window-track i { position:absolute; height:100%; min-width:2px; background:linear-gradient(90deg,#8bd9c1,#c2e2ff); border-radius:5px; transition:left .25s,width .25s; }
+.mission-window-preview > small { grid-column:1/-1; font-size:9px; color:#b1bfca; }.mission-window-preview small span { float:right; }
+.moon-dock .mission-coverage-note { font-size:10px; line-height:1.6; color:#b3c2ce; }
+.mission-planner .mission-primary { background:linear-gradient(125deg,#c7f4e8,#9dccdf); border:1px solid #e1fff7; color:#102c30; font-weight:600; font-size:14px; box-shadow:inset 0 1px #fff9,0 6px 24px #a9e3da16; }
+.mission-site-cards { display:grid; gap:10px; margin:16px 0; }
+.mission-planner .mission-site-cards .location-row { background:linear-gradient(125deg,#ffffff0f,#ffffff03); border:1px solid #ffffff25; border-radius:20px; padding:16px; transition:background .2s,border-color .2s,transform .2s; }
+.mission-site-cards .location-row > span:first-child { flex:1; min-width:0; }
+.mission-site-cards .location-row > span:last-child { align-self:flex-start; color:#c5ebdf; }
+.mission-site-cards .location-row small { color:#b5c5d0; }
+.mission-site-cards .location-potentials { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.mission-site-cards .location-potentials > span { gap:8px; font-size:14px; font-variant-numeric:tabular-nums; }
+.mission-site-cards .location-potentials small { font-size:9px; margin:0 0 3px; }
+.mission-site-cards .location-potentials svg { width:34px; height:24px; }
+.moon-dock.is-dual .dual-site { background:#111c286e; }
+.moon-dock.is-dual .dual-site header { background:linear-gradient(125deg,#c2e7ff12,#ffffff03); }
+.moon-dock.is-dual .dual-timeline { background:#1b2a36e8; border-color:#ffffff30; box-shadow:inset 0 1px #fff2,0 8px 24px #0004; }
+.potential-readout .potential-grid > div { background:#ffffff06; border:1px solid #ffffff19; border-radius:16px; padding:12px 10px; }
+@media(hover:hover) { .mission-planner .mission-site-cards .location-row:hover { background:#ffffff14; border-color:#c6ffeb60; transform:translateY(-1px); } }
+@media(prefers-reduced-motion:reduce) { .mission-window-track i,.mission-site-cards .location-row { transition:none!important; } }
+@supports not (backdrop-filter:blur(1px)) { .moon-dock,.moon-dock.is-dual,.potential-readout { background:#15202bf5; } }

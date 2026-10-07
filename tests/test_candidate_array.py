@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from science.candidates import EVALUATED_SITES, NASA_COORDINATE_SOURCE
@@ -113,6 +114,8 @@ class PublishedCandidateArrayTests(unittest.TestCase):
     def test_every_linked_series_matches_its_served_hash_and_contract(self):
         index = json.loads(INDEX.read_text(encoding="utf-8"))
         self.assertEqual(index["schema_version"], "1.0.0")
+        self.assertEqual(index["time_range"]["sample_count"], 13249)
+        self.assertEqual(index["time_range"]["end_utc"], "2027-01-01T00:00:00Z")
         self.assertEqual(
             [entry["id"] for entry in index["sites"]],
             [site.id for site in EVALUATED_SITES],
@@ -123,7 +126,10 @@ class PublishedCandidateArrayTests(unittest.TestCase):
             self.assertTrue(canonical.is_file(), site.id)
             self.assertEqual(hashlib.sha256(canonical.read_bytes()).hexdigest(), entry["sha256"])
             result = json.loads(canonical.read_text(encoding="utf-8"))
-            validate_result(result, site)
+            validate_result(result, site, index["time_range"]["sample_count"])
+            start = datetime(2026,10,1,tzinfo=timezone.utc)
+            for i, sample in enumerate(result["samples"]):
+                self.assertEqual(datetime.fromisoformat(sample["timestamp"].replace("Z","+00:00")), start+timedelta(minutes=10*i))
             served = ROOT / "apps" / "web" / "public" / entry["data_url"].lstrip("/")
             if served.is_file():
                 self.assertEqual(hashlib.sha256(served.read_bytes()).hexdigest(), entry["sha256"])

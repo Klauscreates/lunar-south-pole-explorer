@@ -79,9 +79,9 @@ class TimeRangeConfig:
             (self.end_utc - self.start_utc).total_seconds()
             / (self.step_minutes * 60.0)
         ) + 1.0
-        if expected_samples > 10_000:
+        if expected_samples > 20_000:
             raise ConfigurationError(
-                "Horizons observer tables are limited to 10,000 output epochs; "
+                "Batched simulations are limited to 20,000 output epochs; "
                 f"this request would produce approximately {expected_samples:.0f}"
             )
 

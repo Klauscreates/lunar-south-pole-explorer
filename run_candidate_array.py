@@ -4,7 +4,7 @@
 No entry is published as validated unless the live/cached NASA/JPL Horizons
 table, local SPICE cross-check, and two-scale LOLA horizon all pass. Existing
 science files are never fabricated to fill gaps. The compact index points to
-complete, retained 1,009-epoch results and hashes the served JSON bytes.
+complete, retained results over the requested coverage and hashes the served JSON bytes.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from typing import Any, Dict, Sequence
 
 from science.candidates import EVALUATED_SITES, EvaluatedSite
 from science.comms import classify_comms_potential
-from science.config import SimulationConfig, SiteConfig, utc_iso
+from science.config import SimulationConfig, SiteConfig, TimeRangeConfig, parse_utc, utc_iso
 from science.errors import SciencePipelineError
 from science.export import write_csv, write_json
 from science.simulation import run_simulation
@@ -44,7 +44,7 @@ def paths_for(site: EvaluatedSite) -> tuple[Path, Path, str]:
     )
 
 
-def validate_result(result: Dict[str, Any], site: EvaluatedSite) -> None:
+def validate_result(result: Dict[str, Any], site: EvaluatedSite, expected_count: int = 1009) -> None:
     """Fail closed on stale, mislabeled, incomplete, or unvalidated exports."""
     if result.get("schema_version") != SCHEMA_VERSION:
         raise SciencePipelineError(f"{site.id}: stale simulation schema")
@@ -56,7 +56,7 @@ def validate_result(result: Dict[str, Any], site: EvaluatedSite) -> None:
     ):
         raise SciencePipelineError(f"{site.id}: site coordinates/name mismatch")
     samples = result.get("samples", [])
-    if len(samples) != 1009 or result.get("time_range", {}).get("sample_count") != 1009:
+    if len(samples) != expected_count or result.get("time_range", {}).get("sample_count") != expected_count:
         raise SciencePipelineError(f"{site.id}: incomplete epoch matrix")
     if len(result.get("horizon", {}).get("profile", [])) != 720:
         raise SciencePipelineError(f"{site.id}: incomplete 0.5-degree horizon")
@@ -112,7 +112,10 @@ def _copy_atomic(source: Path, destination: Path) -> None:
     temporary.replace(destination)
 
 
-def run_array(selected_ids: set[str] | None = None) -> Dict[str, Any]:
+def run_array(selected_ids: set[str] | None = None, end: str = '2027-01-01T00:00:00Z') -> Dict[str, Any]:
+    time_range = TimeRangeConfig(end_utc=parse_utc(end))
+    time_range.validate()
+    expected_count = int((time_range.end_utc-time_range.start_utc).total_seconds()/600)+1
     web_data = WORKSPACE / "apps" / "web" / "public" / "data"
     web_data.mkdir(parents=True, exist_ok=True)
     results: Dict[str, Dict[str, Any]] = {}
@@ -121,6 +124,7 @@ def run_array(selected_ids: set[str] | None = None) -> Dict[str, Any]:
             continue
         print(f"\n[{site.id}] NASA/LOLA + Horizons + local SPICE", flush=True)
         config = SimulationConfig(
+            time_range=time_range,
             site=SiteConfig(
                 name=site.name,
                 latitude_deg=site.latitude_deg,
@@ -131,9 +135,9 @@ def run_array(selected_ids: set[str] | None = None) -> Dict[str, Any]:
             config, WORKSPACE,
             progress=lambda message: print(f"[{site.id}] {message}", flush=True),
         )
-        validate_result(result, site)
+        validate_result(result, site, expected_count)
         json_path, csv_path, _ = paths_for(site)
-        write_json(result, json_path)
+        write_json(result, json_path, compact=True)
         write_csv(result, csv_path)
         results[site.id] = result
 
@@ -147,7 +151,9 @@ def run_array(selected_ids: set[str] | None = None) -> Dict[str, Any]:
         result = results.get(site.id)
         if result is None:
             result = json.loads(json_path.read_text(encoding="utf-8"))
-        validate_result(result, site)
+        validate_result(result, site, expected_count)
+        if result['time_range']['start_utc'] != utc_iso(time_range.start_utc) or result['time_range']['end_utc'] != utc_iso(time_range.end_utc):
+            raise SciencePipelineError(f'{site.id}: mixed date coverage; refusing publication')
         served_path = web_data / web_name
         _copy_atomic(json_path, served_path)
         if site.id == "test-site-a":
@@ -188,13 +194,14 @@ def run_array(selected_ids: set[str] | None = None) -> Dict[str, Any]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--end',default='2027-01-01T00:00:00Z',help='Final UTC boundary; defaults to the published Q4 coverage')
     parser.add_argument(
         "--site", action="append", choices=[site.id for site in EVALUATED_SITES],
         help="Run only this site (repeatable); publish index only when all five validated exports exist",
     )
     args = parser.parse_args(argv)
     try:
-        index = run_array(set(args.site) if args.site else None)
+        index = run_array(set(args.site) if args.site else None, args.end)
     except (SciencePipelineError, OSError, ValueError) as exc:
         print(f"Candidate array failed closed: {exc}", file=sys.stderr)
         return 2

@@ -166,7 +166,7 @@ def main() -> None:
                 "timestamps": [s["timestamp"] for s in parent["samples"]], "scenarios": scenarios,
             }
             path = OUT / f"{site['id']}.json"
-            write_json(artifact, path)
+            write_json(artifact, path, compact=True)
             entries.append({"site_id": site["id"], "url": f"/data/spacecraft/{path.name}",
                             "sha256": sha(path), "parent_sha256": site["sha256"]})
             print(f"{site['name']}: {len(scenarios)} design scenarios × {len(parent['samples'])} epochs", flush=True)

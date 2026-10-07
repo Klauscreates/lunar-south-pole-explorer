@@ -11,6 +11,12 @@ import { CoveredDate, useCoveredDate } from "./CoveredDate";
 import { Methodology } from "./Methodology";
 import { coveredEpoch, coveredInput, COVERAGE_LAST } from "./coverage";
 
+const DATE_PRESETS = [
+  {label:"October", start:"2026-10-01T00:00", end:"2026-11-01T00:00"},
+  {label:"November", start:"2026-11-01T00:00", end:"2026-12-01T00:00"},
+  {label:"December", start:"2026-12-01T00:00", end:"2027-01-01T00:00"},
+];
+
 function PotentialIcon({kind, value}: {kind: "energy" | "comms"; value: number | undefined}) {
   return kind === "energy" ? <svg viewBox="0 0 64 36" aria-hidden="true">
     <rect x="2" y="5" width="52" height="26" rx="7" fill="none" stroke="currentColor" strokeWidth="2.5"/>
@@ -31,8 +37,8 @@ export function MoonExperience({sites, selected, focused, viewKey, epoch, onEpoc
   const [locationsOpen,setLocationsOpen] = useState(false);
   const [step,setStep] = useState<'dates' | 'locations'>('dates');
   const [startDate,setStartDate] = useState(coveredInput(0));
-  const [endDate,setEndDate] = useState(coveredInput(COVERAGE_LAST));
-  const [window,setWindow] = useState({start:0,end:COVERAGE_LAST});
+  const [endDate,setEndDate] = useState(coveredInput(1008));
+  const [window,setWindow] = useState({start:0,end:1008});
   const startIndex=coveredEpoch(startDate), endIndex=coveredEpoch(endDate);
   const validWindow=startIndex!==null && endIndex!==null && startIndex<endIndex;
   const windowLabel=`${coveredInput(window.start).replace('T',' ')} → ${coveredInput(window.end).replace('T',' ')} UTC`;
@@ -86,17 +92,24 @@ export function MoonExperience({sites, selected, focused, viewKey, epoch, onEpoc
         e.preventDefault(); if(!validWindow) return;
         setWindow({start:startIndex!,end:endIndex!});onEpoch(startIndex!);setStep('locations');
       }}>
-        <small>STEP 1 OF 2</small><h2>Pick your dates.</h2>
+        <div className="mission-stepper" aria-label="Step 1 of 2"><span className="active">01 · Dates</span><i/><span>02 · Location</span></div>
+        <div className="mission-date-heading"><div className="mission-calendar-mark" aria-hidden="true"><span>2026</span><strong>Q4</strong><small>OCT — DEC</small></div>
+        <h2>Pick your dates.</h2></div>
         <p>Choose your mission window. Next, explore each location’s modeled energy and Earth visibility for that period.</p>
+        <div className="mission-months" aria-label="Quick date ranges">{DATE_PRESETS.map(preset=><button type="button" key={preset.label} aria-pressed={startDate===preset.start && endDate===preset.end} onClick={()=>{setStartDate(preset.start);setEndDate(preset.end);}}>{preset.label}</button>)}</div>
         <label>Mission start · UTC<input type="datetime-local" step="600" value={startDate} onChange={e=>setStartDate(e.target.value)} required/></label>
         <label>Mission end · UTC<input type="datetime-local" step="600" value={endDate} onChange={e=>setEndDate(e.target.value)} required/></label>
-        <p>Available: October 1, 00:00 – October 8, 00:00, 2026 UTC. 10-minute steps. Later dates are not generated yet.</p>
+        <div className="mission-window-preview"><span>Selected duration</span><strong>{validWindow ? `${((endIndex!-startIndex!)/144).toLocaleString(undefined,{maximumFractionDigits:2})} days` : "Unavailable"}</strong>
+          <div className="mission-window-track" aria-hidden="true">{validWindow && <i style={{left:`${startIndex!/COVERAGE_LAST*100}%`,width:`${(endIndex!-startIndex!)/COVERAGE_LAST*100}%`}}/>}</div>
+          <small>Oct 1<span>Dec 31</span></small>
+        </div>
+        <p className="mission-coverage-note">October 1–December 31, 2026 · 10-minute samples. The final boundary is January 1, 2027 at 00:00 UTC. Custom ranges can span months.</p>
         {!validWindow && <p role="alert">Unavailable — choose dates within the available coverage, with the end after the start.</p>}
-        <button className="locations-compare" type="submit" disabled={!validWindow}>See locations →</button>
+        <button className="locations-compare mission-primary" type="submit" disabled={!validWindow}>See locations →</button>
       </form> :
       <div className="picker-content comparison">
         <button className="locations-compare" onClick={()=>setStep('dates')}>← Change dates</button>
-        <small>STEP 2 OF 2</small>
+        <div className="mission-stepper" aria-label="Step 2 of 2"><span>01 · Dates</span><i/><span className="active">02 · Location</span></div>
         <div className="locations-heading"><h2>Pick your location.</h2>
           <button className="locations-compare" onClick={()=>setCompare(true)}>Compare</button></div>
         <p>{windowLabel}<br/>5 evaluated points · LOLA baseline. Potentials below are for your selected window. Select a location, then compare it with another.</p>
@@ -105,13 +118,13 @@ export function MoonExperience({sites, selected, focused, viewKey, epoch, onEpoc
           <SpacecraftControlPanel study={study} value={scenario} onChange={setScenario}/>
         </details>
         {!complete && <p role="status">{Object.keys(errors).length ? "Some data unavailable; missing results are Unknown." : "Verifying all five spacecraft studies…"}</p>}
-        {ranking.map(({site,metrics})=><button className="location-row" key={site.id} onClick={()=>void choose(site.id)} disabled={!!busy}>
+        <div className="mission-site-cards">{ranking.map(({site,metrics})=><button className="location-row" key={site.id} onClick={()=>void choose(site.id)} disabled={!!busy}>
           <span><strong>{site.name}</strong>
             <small>{site.latitude_deg.toFixed(4)}° · {site.longitude_deg_east.toFixed(4)}° E{site.kind === "validation" ? " · validation point" : ""}</small>
             <span className="location-potentials">
-              <span className="potential-energy"><PotentialIcon kind="energy" value={metrics?.poweredPercent}/><span>{metrics ? `${metrics.kwh.toFixed(2)} kWh` : "Unknown energy"}</span></span>
-              <span className="potential-comms"><PotentialIcon kind="comms" value={metrics?.commsPercent}/><span>{metrics ? `${metrics.commsPercent.toFixed(1)}% LOS` : "Unknown LOS"}</span></span>
-            </span></span><span>{busy === site.id ? "…" : "↗"}</span></button>)}
+              <span className="potential-energy"><PotentialIcon kind="energy" value={metrics?.poweredPercent}/><span><small>Modeled energy</small>{metrics ? `${metrics.kwh.toFixed(2)} kWh` : "Unknown energy"}</span></span>
+              <span className="potential-comms"><PotentialIcon kind="comms" value={metrics?.commsPercent}/><span><small>Earth visibility</small>{metrics ? `${metrics.commsPercent.toFixed(1)}% LOS` : "Unknown LOS"}</span></span>
+            </span></span><span aria-hidden="true">{busy === site.id ? "…" : "↗"}</span></button>)}</div>
         <small>Icons show generating time and Earth-center visibility—not battery charge or RF strength. Thermal inputs assumed; landing safety unassessed.</small>
       </div>}
     </section>

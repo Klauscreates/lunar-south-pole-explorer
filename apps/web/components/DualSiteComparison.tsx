@@ -172,7 +172,10 @@ export function DualSiteComparison({ sites, anchor, epoch, onEpoch, scenario, on
       Promise.all([loadSimulation(site, controller.signal), loadStudy(site, controller.signal),
         loadTerrain(site, controller.signal).then(terrain => ({terrain, terrainError:undefined})).catch(error => ({terrain:undefined, terrainError:String(error)}))])
         .then(([simulation, study, terrain]) => {
-          if (!controller.signal.aborted) setResources(previous => ({...previous, [site.id]: {status:"ready", data:{simulation, study, ...terrain, hash:site.sha256}}}));
+          if (!controller.signal.aborted) setResources(previous => ({
+            ...Object.fromEntries(Object.entries(previous).filter(([id])=>id===a.id || id===b.id)),
+            [site.id]: {status:"ready", data:{simulation, study, ...terrain, hash:site.sha256}},
+          }));
         }).catch(error => {
           if (!controller.signal.aborted) setResources(previous => ({...previous,[site.id]:{status:"error",message:String(error)}}));
         });

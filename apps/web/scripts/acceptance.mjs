@@ -32,7 +32,7 @@ try {
       const date=card.locator('input[type="datetime-local"]');
       await date.fill('2026-10-04T12:00');
       assert.equal(await date.getAttribute('aria-invalid'),'false');
-      await date.fill('2026-10-09T00:00');
+      await date.fill('2027-01-02T00:00');
       await card.getByRole('alert').waitFor();
       assert.match(await card.innerText(),/Unknown power/);
       assert.equal(await card.locator('.potential-grid').count(),0);

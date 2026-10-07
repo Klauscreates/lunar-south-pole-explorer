@@ -128,7 +128,7 @@ class NearfieldTests(unittest.TestCase):
             parent=next(s for s in parents['sites'] if s['id']==entry['site_id'])
             self.assertEqual(report['parent_sha256'],parent['sha256'])
             if report['status']=='NATIVE_RESOLUTION_DIAGNOSTIC':
-                self.assertEqual(len(report['samples']),1009)
+                self.assertEqual(len(report['samples']),13249)
                 self.assertEqual(report['coregistration']['applied'],entry['site_id']=='connecting-ridge')
                 self.assertFalse(report['fusion']['independently_validated'])
                 for row in report['samples']:

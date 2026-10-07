@@ -379,7 +379,7 @@ class SpacecraftAnalysisIntegrationTests(unittest.TestCase):
         # synthetic and live only in TemporaryDirectory; this is not a VIPER
         # prediction or a new flight-qualified output artifact.
         parent = json.loads(_GENERATED_SIMULATION.read_text(encoding="utf-8"))
-        self.assertEqual(len(parent["samples"]), 1009)
+        self.assertEqual(len(parent["samples"]), 13249)
         fixture = self.fixture("full_week_test_only_hardware")
         boundary = _environment()["samples"][0]["panels"]["array_a"]
         fixture["environment"]["samples"] = [
@@ -393,7 +393,7 @@ class SpacecraftAnalysisIntegrationTests(unittest.TestCase):
         result = analyze_spacecraft_files(
             _GENERATED_SIMULATION, fixture["hardware_path"]
         )
-        self.assertEqual(result["sample_count"], 1009)
+        self.assertEqual(result["sample_count"], 13249)
         self.assertEqual(result["analysis_status"], "CONFIGURED_UNVALIDATED")
         self.assertFalse(result["flight_certified"])
         self.assertEqual(

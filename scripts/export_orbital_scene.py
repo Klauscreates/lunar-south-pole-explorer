@@ -19,12 +19,14 @@ def build_scene() -> dict:
     repository = KernelRepository(ROOT / "data/kernels", auto_download=False)
     kernels = repository.resolve()  # Checks every pinned size and SHA-256.
     frame = repository.manifest.reference_frame_name
-    start = datetime(2026, 10, 1, tzinfo=timezone.utc)
+    index = json.loads((ROOT/'outputs/simulation-index.json').read_text())
+    coverage = index['time_range']
+    start = datetime.fromisoformat(coverage['start_utc'].replace('Z','+00:00'))
     rows = []
     with _isolated_kernel_pool(spice, kernels):
         radii = {name.lower(): spice.bodvrd(name, "RADII", 3)[1].tolist()
                  for name in ("EARTH", "SUN", "MOON")}
-        for i in range(1009):
+        for i in range(coverage['sample_count']):
             utc = (start + timedelta(minutes=10 * i)).isoformat().replace("+00:00", "Z")
             et = spice.str2et(utc)
             earth = spice.spkpos("EARTH", et, frame, "NONE", "MOON")[0]
@@ -50,7 +52,7 @@ def main() -> None:
     destination.write_bytes(data)
     manifest = {"url": "/data/orbital-scene.json", "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)}
     (ROOT / "outputs/orbital-index.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    print(f"Exported 1009 geometric epochs, verified kernels; {manifest['sha256']}")
+    print(f"Exported geometric epochs from simulation coverage, verified kernels; {manifest['sha256']}")
 
 
 if __name__ == "__main__":

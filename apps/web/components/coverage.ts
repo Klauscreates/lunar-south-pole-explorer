@@ -1,5 +1,5 @@
 export const COVERAGE_START = Date.parse("2026-10-01T00:00:00Z");
-export const COVERAGE_END = Date.parse("2026-10-08T00:00:00Z");
+export const COVERAGE_END = Date.parse("2027-01-01T00:00:00Z");
 export const COVERAGE_STEP = 600000;
 export const COVERAGE_LAST = (COVERAGE_END - COVERAGE_START) / COVERAGE_STEP;
 export function coveredEpoch(value: string): number | null {

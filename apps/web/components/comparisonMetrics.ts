@@ -4,7 +4,7 @@ import type { Report } from "./LocalTerrainStudy";
 import spec from "../public/data/spacecraft/component-spec.json" with { type: "json" };
 
 export const CELL_SPEC = spec;
-export const EPOCHS = 1009;
+export const EPOCHS = 13249;
 export const START = Date.parse("2026-10-01T00:00:00Z");
 export function epochTime(index: number) { return new Date(START + index * 600000).toISOString(); }
 

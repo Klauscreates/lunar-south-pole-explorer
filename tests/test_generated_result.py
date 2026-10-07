@@ -3,6 +3,10 @@ import json
 import math
 import unittest
 from pathlib import Path
+from datetime import datetime, timezone
+from tempfile import TemporaryDirectory
+from science.windows import build_window_summary
+from science.export import write_csv
 
 OUTPUT = Path(__file__).resolve().parents[1] / "outputs" / "simulation.json"
 CSV_OUTPUT = OUTPUT.with_suffix(".csv")
@@ -49,9 +53,9 @@ class GeneratedResultTests(unittest.TestCase):
     def setUpClass(cls):
         cls.result = json.loads(OUTPUT.read_text(encoding="utf-8"))
 
-    def test_expected_full_week_dimensions(self):
+    def test_expected_full_quarter_dimensions(self):
         self.assertEqual(self.result["schema_version"], "1.3.0")
-        self.assertEqual(len(self.result["samples"]), 1009)
+        self.assertEqual(len(self.result["samples"]), 13249)
         self.assertEqual(len(self.result["horizon"]["profile"]), 720)
         self.assertEqual(len(self.result["horizon_mask"]["profile"]), 360)
         self.assertEqual(self.result["validation"]["overall_status"], "PASS")
@@ -71,8 +75,8 @@ class GeneratedResultTests(unittest.TestCase):
         self.assertEqual(validation["status"], "PASS")
         self.assertTrue(validation["required"])
         self.assertFalse(validation["used_for_simulation"])
-        self.assertEqual(validation["targets"]["sun"]["sample_count"], 1009)
-        self.assertEqual(validation["targets"]["earth"]["sample_count"], 1009)
+        self.assertEqual(validation["targets"]["sun"]["sample_count"], 13249)
+        self.assertEqual(validation["targets"]["earth"]["sample_count"], 13249)
         self.assertLess(
             validation["targets"]["sun"]["angular_separation_arcsec"]["maximum"],
             1.0,
@@ -84,7 +88,10 @@ class GeneratedResultTests(unittest.TestCase):
 
     def test_validator_does_not_change_operational_series_windows_or_csv(self):
         legacy_samples = []
-        for sample in self.result["samples"]:
+        # Preserve the original week byte-for-byte; the extension must not
+        # retroactively alter any previously published geometry or power.
+        original_week = self.result["samples"][:1009]
+        for sample in original_week:
             legacy = {
                 key: value for key, value in sample.items()
                 if key not in {"power_scenarios", "comms_potential"}
@@ -99,14 +106,14 @@ class GeneratedResultTests(unittest.TestCase):
             PRE_SPICE_SAMPLES_SHA256,
         )
         self.assertEqual(
-            _canonical_sha256(self.result["windows"]),
+            _canonical_sha256(build_window_summary(original_week, datetime(2026,10,8,tzinfo=timezone.utc))),
             PRE_SPICE_WINDOWS_SHA256,
         )
         self.assertTrue(CSV_OUTPUT.is_file(), "Canonical CSV export is missing")
-        self.assertEqual(
-            hashlib.sha256(CSV_OUTPUT.read_bytes()).hexdigest(),
-            PRE_SPICE_CSV_SHA256,
-        )
+        with TemporaryDirectory() as directory:
+            csv_path = Path(directory) / "original-week.csv"
+            write_csv({"samples": original_week}, csv_path)
+            self.assertEqual(hashlib.sha256(csv_path.read_bytes()).hexdigest(), PRE_SPICE_CSV_SHA256)
 
     def test_spice_kernel_set_is_pinned_and_covers_interval(self):
         source = self.result["data_sources"]["spice_validation"]
@@ -144,7 +151,7 @@ class GeneratedResultTests(unittest.TestCase):
     def test_combined_durations_partition_requested_span(self):
         combined = self.result["windows"]["combined"]
         total = sum(value["total_duration_seconds"] for value in combined.values())
-        self.assertEqual(total, 7 * 24 * 3600)
+        self.assertEqual(total, 92 * 24 * 3600)
 
     def test_published_pgda_psr_crosscheck(self):
         crosscheck = self.result["validation"]["terrain"]["published_psr_crosscheck"]

@@ -78,9 +78,9 @@ def _atomic_text_output(
             temporary.unlink(missing_ok=True)
 
 
-def write_json(result: Dict[str, Any], path: Path, *, overwrite: bool = True) -> None:
+def write_json(result: Dict[str, Any], path: Path, *, overwrite: bool = True, compact: bool = False) -> None:
     with _atomic_text_output(path, overwrite=overwrite) as handle:
-        json.dump(result, handle, indent=2, sort_keys=False, allow_nan=False)
+        json.dump(result, handle, indent=None if compact else 2, separators=(',',':') if compact else None, sort_keys=False, allow_nan=False)
 
 
 def write_csv(result: Dict[str, Any], path: Path, *, overwrite: bool = True) -> None:

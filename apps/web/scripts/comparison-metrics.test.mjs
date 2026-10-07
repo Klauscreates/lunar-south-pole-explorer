@@ -5,7 +5,7 @@ import { cellReference, comparisonSeries, terrainEvidence, EPOCHS, epochTime } f
 import { weeklyMetrics } from '../components/weeklyMetrics.ts';
 const read = path => JSON.parse(readFileSync(new URL(path, import.meta.url)));
 const catalogue = read('../public/data/simulation-index.json');
-test('all 5045 indexed site epochs and ten R1 scenarios align; cumulative energy matches integration', () => {
+test('all 66245 indexed site epochs and ten R1 scenarios align; cumulative energy matches integration', () => {
   let count = 0;
   for (const site of catalogue.sites) {
     const simulation = read(`../public${site.data_url}`);
@@ -16,10 +16,14 @@ test('all 5045 indexed site epochs and ten R1 scenarios align; cumulative energy
       assert.ok(series);
       assert.equal(series.cumulative[0], 0);
       assert.ok(Math.abs(series.cumulative[EPOCHS - 1] - weeklyMetrics(study, scenario.id).kwh) < 1e-9);
+      const months = [[0,4464],[4464,8784],[8784,13248]].map(([start,end])=>weeklyMetrics(study,scenario.id,start,end));
+      assert.ok(months.every(Boolean));
+      assert.ok(Math.abs(months.reduce((sum,m)=>sum+m.kwh,0)-series.cumulative[EPOCHS-1])<1e-8);
+      assert.ok(Math.abs(months.reduce((sum,m)=>sum+m.hours,0)-2208)<1e-8);
       for (let i = 1; i < EPOCHS; i++) assert.ok(series.cumulative[i] >= series.cumulative[i - 1]);
     }
   }
-  assert.equal(count, 5045);
+  assert.equal(count, 66245);
   assert.equal(epochTime(1008), '2026-10-08T00:00:00.000Z');
 });
 test('XTJ cell reference respects both manufacturer coefficient limits and 28C reference', () => {

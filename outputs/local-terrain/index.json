@@ -3,33 +3,33 @@
   "sites": [
     {
       "site_id": "test-site-a",
-      "parent_sha256": "66d3fd9e7628da7acaf1ee1f7cd8ba12ee3ffa899bb5255f053a6186ded33404",
+      "parent_sha256": "c549179234459f6dc8b29b9fec4c76d0b06dcec312faaa182768d00c46c73bdf",
       "url": "/data/local-terrain/test-site-a.json",
-      "sha256": "e65205d21cda5005cb8683d3b0e397f9787bf02bb5741ccdd1ee3dcc8d4d67d7"
+      "sha256": "ff610492c87777fa8535f150aaf8c97c782d3a0a850370a7bbecab3d4f9e2dd0"
     },
     {
       "site_id": "connecting-ridge",
-      "parent_sha256": "5d964f2221005bbeae8050e680e821e9eba7adc625ec4fb67db7a99d02eafccb",
+      "parent_sha256": "b6b1e8ebdb322375efeb7a96ad940da793dc286fc02ff7fa275342222a8cefbd",
       "url": "/data/local-terrain/connecting-ridge.json",
-      "sha256": "3ffcf2a5603e85277f4c55001e9beb3a02b3b9c0b3b8c7110f9e8a22f625c981"
+      "sha256": "ae64b9fea20c4ba9a632942bbb1835bc80b16a30adc9955667e1d9386a61a03b"
     },
     {
       "site_id": "haworth",
-      "parent_sha256": "154e4f08c97cbb05dadefe87e73dddc552c05d032c34745bd036a173eb0f6950",
+      "parent_sha256": "2a118e7ad99e308b080296024546e17ed64671011a840ca3545901bc01f189f4",
       "url": "/data/local-terrain/haworth.json",
-      "sha256": "ae7fc62f8ec2b6845cf7880639a2b6e00a50eca0b4fcd45bd84bd958c081f272"
+      "sha256": "b460355aa88c7481f5bee6aabeb41c7660b837851cfbffc70422ce4023f28951"
     },
     {
       "site_id": "malapert-massif",
-      "parent_sha256": "c578b4e938f220391807e2e196c6aa78b568cf27274e3ef0521e558c1f2cfb7b",
+      "parent_sha256": "772f50c8677207f734d9cbae64ff3f6888e4f80007c09e3e12ddb843a7401231",
       "url": "/data/local-terrain/malapert-massif.json",
-      "sha256": "3df02caed7a976b6492566d13d4235268cc10f7a1367da9e64c0174bb02b70c5"
+      "sha256": "cc03453fb2234d67c5e262b9a63243db1d5985522d65542284a96eb5ff1116b5"
     },
     {
       "site_id": "nobile-rim-1",
-      "parent_sha256": "dee8b389140e5aa85291e9377009efff11281b94ed47ae1ed31f472cc3aa7c10",
+      "parent_sha256": "c72010f994de393b18db912b0a4eea328ec2914fa01be1b19976950dbab9c300",
       "url": "/data/local-terrain/nobile-rim-1.json",
-      "sha256": "9df1678afa49afba460e6d15aa4465442fe8874329f26ade5cd8affc76f01dbf"
+      "sha256": "dee44309293e2014bff0c85851658fa17627880684fb21e92611388e1135be52"
     }
   ]
 }

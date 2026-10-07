@@ -8,8 +8,9 @@ const source=JSON.parse(bytes);
 test('orbital export integrity, complete time grid and all proper rotation matrices',()=>{
   const manifest=JSON.parse(readFileSync(new URL('../../../outputs/orbital-index.json',import.meta.url)));
   assert.equal(createHash('sha256').update(bytes).digest('hex'),manifest.sha256);
-  assert.equal(validateOrbitalData(source).samples.length,1009);
+  assert.equal(validateOrbitalData(source).samples.length,13249);
   assert.equal(source.samples[1008].utc,'2026-10-08T00:00:00Z');
+  assert.equal(source.samples.at(-1).utc,'2027-01-01T00:00:00Z');
   assert.notDeepEqual(source.samples[0].earth_fixed_to_scene,source.samples[1].earth_fixed_to_scene);
 });
 test('bad frame, missing epochs and reflected matrices fail closed',()=>{

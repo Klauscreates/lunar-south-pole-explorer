@@ -30,14 +30,14 @@ export function OrbitalControls({data,error,epoch,playing,onPlay,onEpoch,onClose
     </button>
     <p className="orbital-scale-caption">Scaled overview · sizes & distances not to scale</p>
     <section className="orbital-panel" aria-label="Orbital date scrubber">
-      {!sample ? <p role="status">{error ?? "Loading verified orbital data…"}</p> : <>
+      {!sample || !data ? <p role="status">{error ?? "Loading verified orbital data…"}</p> : <>
         <label htmlFor="orbital-time"><span>{dateLabel}</span><span>{timeLabel} <small>UTC</small></span></label>
         <div className="orbital-time">
           <button onClick={onPlay} aria-label={playing?"Pause orbital timeline":"Play orbital timeline"}>
             <svg viewBox="0 0 24 24" aria-hidden="true">{playing ? <path d="M8 6v12M16 6v12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/> : <path d="m9 5 11 7-11 7Z" fill="currentColor"/>}</svg>
           </button>
-          <input id="orbital-time" type="range" min="0" max="1008" step="1" value={epoch}
-            style={{"--scrub-progress":`${epoch/1008*100}%`} as React.CSSProperties}
+          <input id="orbital-time" type="range" min="0" max={data.samples.length-1} step="1" value={epoch}
+            style={{"--scrub-progress":`${epoch/(data.samples.length-1)*100}%`} as React.CSSProperties}
             aria-valuetext={`${dateLabel}, ${timeLabel} UTC`}
             onChange={e=>onEpoch(Number(e.target.value))}/>
         </div>

@@ -17,7 +17,7 @@ export function validateOrbitalData(value: unknown): OrbitalData {
   if (!d || d.schema !== 1 || d.frame !== "MOON_ME_DE440_ME421" || d.origin !== "MOON" || d.correction !== "NONE" ||
       d.step_seconds !== 600 || d.matrix_layout !== "row-major" || !d.radii_km ||
       ![d.radii_km.earth,d.radii_km.sun,d.radii_km.moon].every(r => vector(r) && r.every(x=>x>0)) ||
-      !Array.isArray(d.samples) || d.samples.length !== 1009) throw new Error("Unsupported orbital frame or sample coverage");
+      !Array.isArray(d.samples) || d.samples.length !== 13249) throw new Error("Unsupported orbital frame or sample coverage");
   for (const [i,s] of d.samples.entries()) {
     if (!s || Date.parse(s.utc) !== start+i*600000 || !vector(s.earth_km) || !vector(s.sun_km) ||
         Math.hypot(...s.earth_km) < 300000 || Math.hypot(...s.sun_km) < 100000000 ||

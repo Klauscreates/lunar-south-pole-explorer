@@ -106,7 +106,7 @@ def roughness(grid: LocalGrid, x: float, y: float, radius_m: float) -> dict:
 def trace_local(grid: LocalGrid, longitude: float, latitude: float, height_m: float,
                 azimuths, radius_m=500.) -> dict:
     azimuths = np.asarray(azimuths,dtype=float)
-    if azimuths.ndim != 1 or not np.isfinite(azimuths).all() or len(azimuths)>20000:
+    if azimuths.ndim != 1 or not np.isfinite(azimuths).all() or len(azimuths)>40000:
         raise TerrainDataError("Invalid or oversized azimuth list")
     if not np.isfinite(height_m) or height_m <= 0 or not 2*grid.resolution_m <= radius_m <= 1000:
         raise TerrainDataError("Invalid height or local ray radius")
@@ -127,7 +127,7 @@ def trace_distances(grid, longitude, latitude, height_m, azimuths, distances, an
     """Trace one scale with a caller-specified, shared observer elevation."""
     azimuths, distances = np.asarray(azimuths,dtype=float),np.asarray(distances,dtype=float)
     if (azimuths.ndim != 1 or distances.ndim != 1 or not len(distances) or
-        len(azimuths)>20000 or len(distances)>10000 or
+        len(azimuths)>40000 or len(distances)>10000 or
         not np.isfinite(azimuths).all() or not np.isfinite(distances).all() or
         np.any(distances<=0) or np.any(np.diff(distances)<=0) or distances[-1]>200000 or
         not np.isfinite(anchor) or not np.isfinite(height_m) or height_m<=0):
