@@ -100,3 +100,9 @@
 @media(prefers-reduced-motion:reduce) {
   .moon-dock,.potential-readout,.moon-map-actions button { transition:none!important; animation:none!important; }
 }
+.mission-date-selection { display:grid; gap:16px; }
+.mission-date-selection label { display:grid; gap:8px; color:#c4ccd5; }
+.mission-date-selection input { width:100%; min-width:0; box-sizing:border-box; color-scheme:dark; background:#ffffff0b; border:1px solid #ffffff25; color:#edf2f7; border-radius:14px; padding:12px; font:inherit; }
+.mission-date-selection button { min-height:44px; }
+.mission-date-selection button:disabled { opacity:.4; cursor:not-allowed; }
+@media(max-width:480px) { .mission-planner .moon-map-actions button { font-size:12px; padding:8px 10px; } .moon-map-actions { gap:5px; } }

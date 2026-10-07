@@ -10,6 +10,7 @@ import { SpacecraftControlPanel } from "./SpacecraftControlPanel";
 import { CELL_SPEC, EPOCHS, cellReference, comparisonSeries, epochTime, terrainEvidence } from "./comparisonMetrics";
 import "./dual-comparison.css";
 import { getMissionInsight } from "./missionInsight";
+import { weeklyMetrics } from "./weeklyMetrics";
 
 type Pair = { anchorId: string; targetId: string };
 type Bundle = { simulation: SimulationResult; study: Study; terrain?: Report; terrainError?: string; hash: string };
@@ -72,11 +73,12 @@ function Sky({ simulation, sun, earth }: { simulation: SimulationResult; sun: Bo
   </svg>;
 }
 
-function SiteColumn({ slot, site, resource, scenario, epoch }: {
-  slot: "A" | "B"; site: IndexedSite; resource?: Resource; scenario: string; epoch: number;
+function SiteColumn({ slot, site, resource, scenario, epoch, window }: {
+  slot: "A" | "B"; site: IndexedSite; resource?: Resource; scenario: string; epoch: number; window:{start:number;end:number};
 }) {
   const bundle = resource?.status === "ready" && resource.data.hash === site.sha256 ? resource.data : undefined;
   const series = useMemo(() => bundle ? comparisonSeries(bundle.simulation, bundle.study, scenario) : null, [bundle, scenario]);
+  const totals = useMemo(()=>bundle ? weeklyMetrics(bundle.study,scenario,window.start,window.end) : null,[bundle,scenario,window.start,window.end]);
   const sample = bundle?.simulation.samples[epoch];
   const row = series?.rows[epoch];
   const terrain = terrainEvidence(bundle?.terrain);
@@ -99,6 +101,7 @@ function SiteColumn({ slot, site, resource, scenario, epoch }: {
     <header><small>{slot === "A" ? "A / ANCHOR SITE" : "B / COMPARISON TARGET"}</small><h3>{site.name}</h3>
       <p>{site.latitude_deg.toFixed(4)}° · {site.longitude_deg_east.toFixed(4)}° E</p>
       <span className="state-tag">{blocked ? "CENTER LOS BLOCKED" : row[0] === 0 ? "NO MODELED GENERATION" : state === "warning" ? "MODEL LIMIT / CAUTION" : "GEOMETRY CLEAR"}</span>
+      <p>Selected window: {totals ? `${totals.kwh.toFixed(2)} kWh modeled · ${totals.commsPercent.toFixed(1)}% Earth-center LOS` : 'Unknown'}</p>
     </header>
     <section className="dual-pillar"><h4>01 / Horizon Clearance Profiles</h4>
       <Sky simulation={bundle.simulation} sun={sample.sun} earth={sample.earth}/>
@@ -114,7 +117,7 @@ function SiteColumn({ slot, site, resource, scenario, epoch }: {
       <div className="power-instrument"><div className={`vertical-battery ${row[0] > 150 ? "power-high" : ""}`} aria-hidden="true">
         <div className="battery-fluid" style={{height:`${fill}%`}}/></div>
         <div><strong><Count value={row[0]} unit=" W"/></strong><small>R1 modeled generation</small>
-          <strong><Count value={series.cumulative[epoch]} digits={3} unit=" kWh"/></strong><small>Accumulated since Oct 1</small></div></div>
+          <strong><Count value={series.cumulative[epoch]-series.cumulative[window.start]} digits={3} unit=" kWh"/></strong><small>Accumulated since mission start</small></div></div>
       <p>Net after vehicle loads: <b>Unknown</b>.</p>
       <small>Legacy assumed-efficiency R1 output; not calibrated XTJ power. Fill is relative to {referenceWatts ? `${referenceWatts.toFixed(0)} W` : "unknown reference"}, not battery charge.</small>
     </section>
@@ -153,13 +156,14 @@ function SiteColumn({ slot, site, resource, scenario, epoch }: {
   </article>;
 }
 
-export function DualSiteComparison({ sites, anchor, epoch, onEpoch, scenario, onScenario, loadSimulation }: {
+export function DualSiteComparison({ sites, anchor, epoch, onEpoch, scenario, onScenario, loadSimulation, window = {start:0,end:EPOCHS-1} }: {
   sites: IndexedSite[]; anchor: IndexedSite; epoch: number; onEpoch: (epoch: number) => void;
   scenario: string; onScenario: (scenario: string) => void; loadSimulation: SimulationLoader;
+  window?: {start:number;end:number};
 }) {
   const [pair, setPair] = useState<Pair>(() => ({ anchorId: anchor.id, targetId: sites.find(s => s.id !== anchor.id)!.id }));
   const [resources, setResources] = useState<Record<string, Resource>>({});
-  const date = useCoveredDate(epoch,onEpoch);
+  const date = useCoveredDate(epoch,onEpoch,window.start,window.end);
   const a = sites.find(s => s.id === pair.anchorId)!;
   const b = sites.find(s => s.id === pair.targetId)!;
   useEffect(() => {
@@ -190,13 +194,13 @@ export function DualSiteComparison({ sites, anchor, epoch, onEpoch, scenario, on
     {date.available && <>
     <div className="mission-insights" aria-label="Mission status at selected epoch"><Insight site={a} resource={resources[a.id]} scenario={scenario} epoch={epoch}/><Insight site={b} resource={resources[b.id]} scenario={scenario} epoch={epoch}/></div>
     <div className="dual-timeline"><label htmlFor="dual-epoch">Synchronized epoch <output>{epochTime(epoch).replace("T"," ").replace(".000Z"," UTC")}</output></label>
-      <div><button disabled={epoch===0} onClick={()=>onEpoch(epoch-1)} aria-label="Previous ten minutes">−</button>
-        <input id="dual-epoch" type="range" min="0" max={EPOCHS-1} step="1" value={epoch} onChange={e=>onEpoch(Number(e.target.value))} aria-valuetext={epochTime(epoch)}/>
-        <button disabled={epoch===EPOCHS-1} onClick={()=>onEpoch(epoch+1)} aria-label="Next ten minutes">＋</button></div>
-      <small>Oct 1 → Oct 8, 2026 · animated numerals settle to the exact selected sample.</small>
+      <div><button disabled={epoch<=window.start} onClick={()=>onEpoch(epoch-1)} aria-label="Previous ten minutes">−</button>
+        <input id="dual-epoch" type="range" min={window.start} max={window.end} step="1" value={epoch} onChange={e=>onEpoch(Number(e.target.value))} aria-valuetext={epochTime(epoch)}/>
+        <button disabled={epoch>=window.end} onClick={()=>onEpoch(epoch+1)} aria-label="Next ten minutes">＋</button></div>
+      <small>{epochTime(window.start).replace('T',' ')} → {epochTime(window.end).replace('T',' ')} · selected mission window.</small>
     </div>
-    <div className="dual-grid"><SiteColumn key={`A-${a.id}`} slot="A" site={a} resource={resources[a.id]} scenario={scenario} epoch={epoch}/>
-      <SiteColumn key={`B-${b.id}`} slot="B" site={b} resource={resources[b.id]} scenario={scenario} epoch={epoch}/></div>
+    <div className="dual-grid"><SiteColumn key={`A-${a.id}`} slot="A" site={a} resource={resources[a.id]} scenario={scenario} epoch={epoch} window={window}/>
+      <SiteColumn key={`B-${b.id}`} slot="B" site={b} resource={resources[b.id]} scenario={scenario} epoch={epoch} window={window}/></div>
     </>}
     <p className="dual-source">XTJ reference: <a href={CELL_SPEC.source.url} target="_blank" rel="noreferrer">Spectrolab datasheet</a> · {CELL_SPEC.source.revision} · not promoted to the R1 assembly model. Green means geometry clear only; amber means model limits; red means modeled center LOS blackout.</p>
   </div>;

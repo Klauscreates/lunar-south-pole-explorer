@@ -18,3 +18,10 @@ test("all five real studies cover 168 hours with bounded availability",()=>{
  assert.ok(m.commsPercent>=0&&m.commsPercent<=100);assert.ok(m.poweredPercent>=0&&m.poweredPercent<=100);}
  }
 });
+test('mission windows integrate only selected intervals and reject invalid bounds',()=>{
+ const study={timestamps:['2026-10-01T00:00:00Z','2026-10-01T01:00:00Z','2026-10-01T03:00:00Z'],scenarios:[{id:'a',rows:[[100,0,0,0,0,false,false,true],[200,0,0,0,0,false,false,false],[9999,0,0,0,0,false,false,true]]}]};
+ const m=weeklyMetrics(study,'a',1,2);
+ assert.equal(m.kwh,.4);assert.equal(m.hours,2);assert.equal(m.commsPercent,0);
+ for(const [a,b] of [[1,1],[2,1],[-1,2],[0,3],[.5,2],[NaN,2]]) assert.equal(weeklyMetrics(study,'a',a,b),null);
+ assert.equal(weeklyMetrics(study,'a',0,2).kwh,weeklyMetrics(study,'a',0,1).kwh+m.kwh);
+});

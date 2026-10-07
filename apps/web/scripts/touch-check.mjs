@@ -16,7 +16,7 @@ try {
     await touch('touchEnd',[]); await page.waitForTimeout(400);
   }
   await page.goto(process.env.APP_URL || 'http://127.0.0.1:3000');
-  await page.getByRole('button',{name:'Locations',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Plan your mission',exact:true}).waitFor();
   await page.locator('canvas').first().waitFor(); await page.waitForTimeout(2500);
   for(const delta of [[70,0],[-70,0],[0,70],[0,-70]]) await drag(...delta);
   assert.equal(await page.getByRole('group',{name:'Touch camera controls'}).count(),0);
@@ -37,7 +37,7 @@ try {
   await touch('touchEnd',[]);
   await page.getByRole('button',{name:'Close orbital view'}).click();
   await drag(30,0);
-  await page.getByRole('button',{name:'Locations',exact:true}).click();
+  await page.getByRole('button',{name:'Plan your mission',exact:true}).click();await page.getByRole('button',{name:'See locations →',exact:true}).click();
   assert.equal(await page.locator('.location-row').count(),5);
   assert.deepEqual(errors,[]);
   console.log('PASS orbital pan changes rendered scene; four directions, pinch, exit and controls remain functional');

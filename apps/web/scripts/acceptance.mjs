@@ -14,9 +14,9 @@ try {
     page.on('pageerror',e=>errors.push(String(e)));
     page.setDefaultTimeout(20000);
     await page.goto(base);
-    await page.getByRole('button',{name:'Locations',exact:true}).waitFor();
+    await page.getByRole('button',{name:'Plan your mission',exact:true}).waitFor();
     assert.equal(await page.locator('.moon-dock').isVisible(),false);
-    await page.getByRole('button',{name:'Locations',exact:true}).click();
+    await page.getByRole('button',{name:'Plan your mission',exact:true}).click();await page.getByRole('button',{name:'See locations →',exact:true}).click();
     await page.locator('.location-row').last().waitFor();
     assert.equal(await page.locator('.location-row').count(),5);
     await page.locator('#location-browser .mission-methodology').first().locator('summary').click();
@@ -38,15 +38,15 @@ try {
       assert.equal(await card.locator('.potential-grid').count(),0);
       await date.fill('2026-10-08T00:00');
       await card.getByText(/W modeled generation/).waitFor();
-      await page.getByRole('button',{name:'Locations',exact:true}).click();
+      await page.getByRole('button',{name:'Plan your mission',exact:true}).click();await page.getByRole('button',{name:'See locations →',exact:true}).click();
     }
     pass(`${viewport.width}px: all five sites, selection, dates, fail-closed results`);
-    await page.getByRole('button',{name:'Close locations',exact:true}).click();
+    await page.getByRole('button',{name:'Close mission planner',exact:true}).click();
     await page.getByRole('button',{name:'◉ Sky · toward Earth',exact:true}).click();
     await page.locator('.sky-disclosure').waitFor();
     await page.getByRole('button',{name:'Moon overview',exact:true}).click();
     assert.equal(await page.locator('.sky-disclosure').count(),0);
-    await page.getByRole('button',{name:'Locations',exact:true}).click();
+    await page.getByRole('button',{name:'Plan your mission',exact:true}).click();await page.getByRole('button',{name:'See locations →',exact:true}).click();
     assert.equal(await page.locator('.orbit-launch').isVisible(),false);
     pass(`${viewport.width}px: sky view, globe reset and unobstructed location sheet`);
     await page.getByRole('button',{name:'Compare',exact:true}).click();
@@ -74,7 +74,7 @@ try {
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
     await page.screenshot({path:`/tmp/lunar-compare-${viewport.width}.png`});
     pass(`${viewport.width}px: comparison targets, ten configurations, boundary epochs, no horizontal overflow`);
-    await page.getByRole('button',{name:'Close locations',exact:true}).click();
+    await page.getByRole('button',{name:'Close mission planner',exact:true}).click();
     await page.getByRole('button',{name:'◌ Orbital view',exact:true}).click();
     await page.getByRole('button',{name:'Play orbital timeline'}).waitFor();
     const orbital=page.locator('.orbital-panel input[type="range"]');
@@ -130,7 +130,7 @@ try {
   pass('terrain proxy health, inspection and invalid route rejection');
   const page=await browser.newPage();
   await page.route('**/data/spacecraft/test-site-a.json',route=>route.fulfill({status:503,body:'Unavailable'}));
-  await page.goto(base);await page.getByRole('button',{name:'Locations',exact:true}).click();
+  await page.goto(base);await page.getByRole('button',{name:'Plan your mission',exact:true}).click();await page.getByRole('button',{name:'See locations →',exact:true}).click();
   await page.getByText('Some data unavailable; missing results are Unknown.').waitFor();
   assert.match(await page.locator('.location-row').first().innerText(),/Unknown energy/);
   pass('missing spacecraft study remains Unknown');
@@ -147,7 +147,7 @@ try {
     const response=await route.fetch();
     await route.fulfill({response,body:(await response.text())+' '});
   });
-  await corrupt.goto(base);await corrupt.getByRole('button',{name:'Locations',exact:true}).click();
+  await corrupt.goto(base);await corrupt.getByRole('button',{name:'Plan your mission',exact:true}).click();await corrupt.getByRole('button',{name:'See locations →',exact:true}).click();
   await corrupt.getByText('Some data unavailable; missing results are Unknown.').waitFor();
   assert.match(await corrupt.locator('.location-row').first().innerText(),/Unknown energy/);
   pass('corrupted checksum cannot produce a spacecraft prediction');
