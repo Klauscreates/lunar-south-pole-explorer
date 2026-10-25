@@ -274,7 +274,11 @@ endsolid test_wall
             external = Path(outside) / "external.obj"
             external.write_bytes(mesh_bytes)
             (self.root / "synthetic.obj").unlink()
-            (self.root / "synthetic.obj").symlink_to(external)
+            try:
+                (self.root / "synthetic.obj").symlink_to(external)
+            except OSError:
+                # Windows needs Developer Mode or admin rights for symlinks.
+                self.skipTest("symlink creation not permitted on this system")
             with self.assertRaises(ConfigurationError):
                 load_spacecraft_geometry(manifest_path, allowed_root=self.root)
 

@@ -3,8 +3,13 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const webRoot = fileURLToPath(new URL("../", import.meta.url));
+// venv layout differs by platform: Scripts/python.exe on Windows.
+const python =
+  process.platform === "win32"
+    ? `${root}/.venv/Scripts/python.exe`
+    : `${root}/.venv/bin/python`;
 const terrain = spawn(
-  `${root}/.venv/bin/python`,
+  python,
   ["scripts/terrain_server.py"],
   { cwd: root, stdio: "inherit" },
 );

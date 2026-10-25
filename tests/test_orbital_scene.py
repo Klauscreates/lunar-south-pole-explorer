@@ -19,6 +19,10 @@ def test_orbital_positions_and_attitude_match_inertial_spice_chain():
             rotation=spice.pxform(data['frame'],'J2000',et)
             for name in ('EARTH','SUN'):
                 independent=spice.spkpos(name,et,'J2000','NONE','MOON')[0]
-                assert np.allclose(rotation @ row[f'{name.lower()}_km'],independent,atol=1e-6,rtol=0)
+                # Scale by vector length: platform float differences reach ~1e-13
+                # relative on the ~1.5e8 km Sun vector, beyond a fixed 1e-6 km.
+                error=np.linalg.norm(rotation @ row[f'{name.lower()}_km']-independent)
+                assert error<=1e-6+1e-12*np.linalg.norm(independent)
             body=np.array(row['earth_fixed_to_scene']).reshape(3,3)
-            assert np.allclose(rotation @ body,spice.pxform('IAU_EARTH','J2000',et),atol=1e-12,rtol=0)
+            # Windows libm differs by up to ~5e-12; 1e-10 rad is still sub-mm at Earth's surface.
+            assert np.allclose(rotation @ body,spice.pxform('IAU_EARTH','J2000',et),atol=1e-10,rtol=0)

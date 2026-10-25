@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import os
 import stat
 import tempfile
 import unittest
@@ -43,6 +44,7 @@ class AtomicExportTests(unittest.TestCase):
             self.assertEqual(output.read_text(encoding="utf-8"), "previous valid result")
             self.assertEqual([item.name for item in Path(folder).iterdir()], ["analysis.json"])
 
+    @unittest.skipIf(os.name == "nt", "Windows has no POSIX permission bits")
     def test_overwrite_preserves_existing_file_permissions(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             output = Path(folder) / "analysis.json"
